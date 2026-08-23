@@ -1,0 +1,26 @@
+.farmer-layout {
+  min-height: 100vh;
+  background: var(--background);
+}
+
+.farmer-main {
+  min-height: 100vh;
+  margin-left: var(--sidebar-width);
+}
+
+.farmer-content {
+  min-height: calc(100vh - var(--topbar-height));
+  padding: 28px;
+}
+
+/* Mobile */
+
+@media (max-width: 700px) {
+  .farmer-main {
+    margin-left: 0;
+  }
+
+  .farmer-content {
+    padding: 20px;
+  }
+}

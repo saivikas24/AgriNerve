@@ -1,0 +1,230 @@
+/* =========================================================
+   AgriNerve Design System
+   Agricultural Decision Intelligence for Andhra Pradesh
+   ========================================================= */
+
+:root {
+  /* Andhra-inspired core palette */
+  --agri-green-900: #173d24;
+  --agri-green-700: #28613a;
+  --agri-green-600: #357a45;
+  --agri-green-500: #4d9657;
+  --agri-green-100: #e8f3e9;
+
+  /* Harvest / crop tones */
+  --harvest-gold: #d69b2d;
+  --harvest-light: #fff4d6;
+
+  /* Chilli-inspired alert accent */
+  --chilli-red: #c84b3c;
+  --chilli-light: #fbe9e6;
+
+  /* Water / irrigation */
+  --water-blue: #287da8;
+  --water-light: #e7f4fa;
+
+  /* Soil / earth */
+  --soil-brown: #795548;
+  --soil-light: #f3ece7;
+
+  /* Neutral / rice-inspired surfaces */
+  --rice-white: #fffdf8;
+  --surface-white: #ffffff;
+  --background: #f5f7f2;
+
+  /* Text */
+  --text-primary: #1d281f;
+  --text-secondary: #667066;
+  --text-muted: #8a938b;
+  --text-inverse: #ffffff;
+
+  /* Borders */
+  --border-light: #e1e7df;
+  --border-medium: #cbd5ca;
+
+  /* Status */
+  --status-success: #2f7d3b;
+  --status-warning: #c58a1d;
+  --status-danger: #c7473a;
+  --status-info: #287da8;
+
+  /* Typography */
+  --font-primary:
+    Inter,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+
+  /* Radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+
+  /* Shadows */
+  --shadow-sm: 0 2px 8px rgba(25, 50, 30, 0.05);
+  --shadow-md: 0 8px 24px rgba(25, 50, 30, 0.08);
+  --shadow-lg: 0 16px 40px rgba(25, 50, 30, 0.12);
+
+  /* Layout */
+  --sidebar-width: 250px;
+  --topbar-height: 72px;
+}
+
+/* =========================================================
+   Global foundation
+   ========================================================= */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-family: var(--font-primary);
+  background: var(--background);
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background: var(--background);
+  color: var(--text-primary);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* =========================================================
+   Reusable AgriNerve components
+   ========================================================= */
+
+.agri-card {
+  background: var(--surface-white);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.agri-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.agri-card-title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 650;
+  color: var(--text-primary);
+}
+
+.agri-card-subtitle {
+  margin: 5px 0 0;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+/* =========================================================
+   Status badges
+   ========================================================= */
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status-success {
+  background: var(--agri-green-100);
+  color: var(--status-success);
+}
+
+.status-warning {
+  background: var(--harvest-light);
+  color: var(--status-warning);
+}
+
+.status-danger {
+  background: var(--chilli-light);
+  color: var(--status-danger);
+}
+
+.status-info {
+  background: var(--water-light);
+  color: var(--status-info);
+}
+
+/* =========================================================
+   Primary button
+   ========================================================= */
+
+.agri-button-primary {
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 12px 18px;
+  background: var(--agri-green-700);
+  color: var(--text-inverse);
+  font-weight: 600;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.agri-button-primary:hover {
+  background: var(--agri-green-900);
+  transform: translateY(-1px);
+}
+
+/* =========================================================
+   Section headings
+   ========================================================= */
+
+.agri-section-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.agri-section-description {
+  margin: 6px 0 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+/* =========================================================
+   Responsive
+   ========================================================= */
+
+@media (max-width: 900px) {
+  :root {
+    --sidebar-width: 220px;
+  }
+}
+
+@media (max-width: 700px) {
+  :root {
+    --sidebar-width: 0px;
+  }
+}

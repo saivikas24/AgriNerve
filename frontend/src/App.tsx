@@ -1,26 +1,49 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter,
+  Navigate,
+  Route,
+  Routes,
+} from "react-router-dom";
 
 import Login from "./pages/auth/Login";
 import FarmerDashboard from "./pages/farmer/FarmerDashboard";
 import OfficerDashboard from "./pages/officer/officerDashboard";
 
+import FarmerLayout from "./layouts/FarmerLayout";
+
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Navigate to="/login" replace />} />
 
-        <Route path="/login" element={<Login />} />
-
+        {/* Default */}
         <Route
-          path="/farmer/dashboard"
-          element={<FarmerDashboard />}
+          path="/"
+          element={<Navigate to="/login" replace />}
         />
 
+        {/* Authentication */}
+        <Route
+          path="/login"
+          element={<Login />}
+        />
+
+        {/* Farmer Application */}
+        <Route element={<FarmerLayout />}>
+
+          <Route
+            path="/farmer/dashboard"
+            element={<FarmerDashboard />}
+          />
+
+        </Route>
+
+        {/* Officer */}
         <Route
           path="/officer/dashboard"
           element={<OfficerDashboard />}
         />
+
       </Routes>
     </BrowserRouter>
   );
