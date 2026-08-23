@@ -1,0 +1,71 @@
+.water-status-card {
+  padding: 20px;
+}
+
+.water-icon {
+  background: var(--water-light);
+}
+
+.water-main-status {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+
+  margin-top: 22px;
+}
+
+.water-availability {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.water-availability span {
+  color: var(--text-muted);
+  font-size: 10px;
+}
+
+.water-availability strong {
+  color: var(--text-primary);
+  font-size: 26px;
+  font-weight: 750;
+}
+
+.water-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+
+  margin-top: 20px;
+  padding-top: 15px;
+
+  border-top: 1px solid var(--border-light);
+}
+
+.water-details div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.water-details span {
+  color: var(--text-muted);
+  font-size: 10px;
+}
+
+.water-details strong {
+  color: var(--text-primary);
+  font-size: 12px;
+}
+
+@media (max-width: 600px) {
+  .water-main-status {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .water-details {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,126 @@
+/* =========================================================
+   Farm Profile Card
+   ========================================================= */
+
+.farm-profile-card {
+  padding: 24px;
+}
+
+.farm-profile-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.farm-profile-eyebrow {
+  display: block;
+
+  margin-bottom: 7px;
+
+  color: var(--agri-green-600);
+
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 1px;
+}
+
+.farm-profile-header h2 {
+  margin: 0;
+
+  color: var(--text-primary);
+
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.farm-profile-header p {
+  margin: 5px 0 0;
+
+  color: var(--text-secondary);
+
+  font-size: 13px;
+}
+
+.farm-profile-icon {
+  width: 48px;
+  height: 48px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  background: var(--harvest-light);
+  border-radius: 14px;
+
+  font-size: 23px;
+}
+
+.farm-profile-details {
+  display: grid;
+
+  grid-template-columns: repeat(3, 1fr);
+
+  margin-top: 24px;
+
+  border-top: 1px solid var(--border-light);
+  padding-top: 20px;
+}
+
+.farm-detail {
+  padding: 0 18px;
+
+  border-right: 1px solid var(--border-light);
+}
+
+.farm-detail:first-child {
+  padding-left: 0;
+}
+
+.farm-detail:last-child {
+  border-right: none;
+}
+
+.farm-detail-label {
+  display: block;
+
+  margin-bottom: 6px;
+
+  color: var(--text-muted);
+
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+}
+
+.farm-detail strong {
+  color: var(--text-primary);
+
+  font-size: 14px;
+  font-weight: 650;
+}
+
+/* Mobile */
+
+@media (max-width: 600px) {
+  .farm-profile-details {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .farm-detail {
+    padding: 0 0 12px;
+    border-right: none;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .farm-detail:last-child {
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+}
+
+
+

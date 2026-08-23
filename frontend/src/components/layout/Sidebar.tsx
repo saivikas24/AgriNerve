@@ -42,17 +42,14 @@ function Sidebar() {
           <span>My Farm</span>
         </NavLink>
 
-        <button className="sidebar-link future-link" disabled>
-          <span className="sidebar-icon">🌿</span>
-          <span>Crop Health</span>
-          <small>Coming soon</small>
-        </button>
-
-        <button className="sidebar-link future-link" disabled>
-          <span className="sidebar-icon">📈</span>
-          <span>Market Intelligence</span>
-          <small>Coming soon</small>
-        </button>
+        <NavLink to="/farmer/disease-detection"
+                 className={({ isActive }) =>
+                  `sidebar-link ${isActive ? "active" : ""}`
+                        }
+                                >
+                     <span className="sidebar-icon">🌿</span>
+                 <span>Crop Health</span>
+        </NavLink>
 
         <button className="sidebar-link future-link" disabled>
           <span className="sidebar-icon">💧</span>

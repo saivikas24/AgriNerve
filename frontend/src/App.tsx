@@ -4,13 +4,12 @@ import {
   Route,
   Routes,
 } from "react-router-dom";
-
 import Login from "./pages/auth/Login";
 import FarmerDashboard from "./pages/farmer/FarmerDashboard";
 import OfficerDashboard from "./pages/officer/officerDashboard";
 
 import FarmerLayout from "./layouts/FarmerLayout";
-
+import DiseaseDetection from "./pages/farmer/DiseaseDetection";
 function App() {
   return (
     <BrowserRouter>
@@ -35,6 +34,10 @@ function App() {
             path="/farmer/dashboard"
             element={<FarmerDashboard />}
           />
+              <Route
+               path="/farmer/disease-detection"
+               element={<DiseaseDetection />}
+              />
 
         </Route>
 

@@ -1,0 +1,165 @@
+.recommendation-card {
+  padding: 24px;
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--agri-green-900),
+      var(--agri-green-700)
+    );
+
+  border-radius: var(--radius-lg);
+
+  color: var(--text-inverse);
+
+  box-shadow: var(--shadow-md);
+}
+
+.recommendation-header {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+}
+
+.recommendation-icon {
+  width: 44px;
+  height: 44px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  background: rgba(255, 255, 255, 0.12);
+
+  border-radius: 12px;
+
+  font-size: 20px;
+}
+
+.recommendation-eyebrow {
+  display: block;
+
+  margin-bottom: 4px;
+
+  color: var(--harvest-light);
+
+  font-size: 9px;
+  font-weight: 750;
+  letter-spacing: 1px;
+}
+
+.recommendation-header h2 {
+  margin: 0;
+
+  color: white;
+
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.recommendation-priority {
+  margin-left: auto;
+
+  padding: 6px 9px;
+
+  border-radius: 999px;
+
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.recommendation-priority-high {
+  background: rgba(200, 75, 60, 0.25);
+  color: #ffd4ce;
+}
+
+.recommendation-priority-medium {
+  background: rgba(214, 155, 45, 0.22);
+  color: #ffe7a8;
+}
+
+.recommendation-priority-low {
+  background: rgba(255, 255, 255, 0.12);
+  color: #e2f2e5;
+}
+
+.recommendation-content {
+  margin-top: 22px;
+}
+
+.recommendation-content > p {
+  max-width: 760px;
+
+  margin: 0;
+
+  color: rgba(255, 255, 255, 0.84);
+
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.recommendation-action {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  margin-top: 18px;
+  padding: 15px;
+
+  background: rgba(255, 255, 255, 0.08);
+
+  border: 1px solid rgba(255, 255, 255, 0.09);
+
+  border-radius: 12px;
+}
+
+.recommendation-action span {
+  color: rgba(255, 255, 255, 0.52);
+
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+}
+
+.recommendation-action strong {
+  color: white;
+
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.recommendation-footer {
+  display: flex;
+  justify-content: space-between;
+
+  margin-top: 18px;
+  padding-top: 14px;
+
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.recommendation-footer span {
+  color: rgba(255, 255, 255, 0.52);
+
+  font-size: 10px;
+}
+
+.recommendation-footer strong {
+  color: var(--harvest-light);
+
+  font-size: 11px;
+}
+
+@media (max-width: 600px) {
+  .recommendation-header {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .recommendation-priority {
+    margin-left: 57px;
+  }
+}
