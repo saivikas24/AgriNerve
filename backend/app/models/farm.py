@@ -8,6 +8,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.core.database import Base
 
 if TYPE_CHECKING:
+    from app.models.crop import Crop
     from app.models.farmer import FarmerProfile
 
 
@@ -69,4 +70,8 @@ class Farm(Base):
 
     farmer: Mapped["FarmerProfile"] = relationship(
         back_populates="farms",
+    )
+
+    crops: Mapped[list["Crop"]] = relationship(
+        back_populates="farm",
     )
