@@ -23,3 +23,11 @@ venv/
 # OS
 .DS_Store
 Thumbs.db
+# Machine Learning
+ml/.venv/
+ml/data/
+ml/models/*.pth
+ml/models/*.pt
+
+# Jupyter
+.ipynb_checkpoints/

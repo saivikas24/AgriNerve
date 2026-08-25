@@ -4,7 +4,7 @@
 }
 
 /* =========================================================
-   Page Heading
+   Heading
    ========================================================= */
 
 .disease-heading {
@@ -71,8 +71,6 @@
     box-shadow 0.2s ease;
 }
 
-/* Dragging state */
-
 .disease-upload-card.drag-active {
   border-color: var(--agri-green-600);
 
@@ -116,7 +114,7 @@
   font-weight: 700;
 }
 
-.disease-upload-card > p {
+.upload-description {
   max-width: 450px;
 
   margin: 8px 0 22px;
@@ -126,10 +124,6 @@
   font-size: 13px;
   line-height: 1.5;
 }
-
-/* =========================================================
-   Drag and Drop
-   ========================================================= */
 
 .drop-hint {
   margin-top: 4px;
@@ -153,8 +147,10 @@
    ========================================================= */
 
 .upload-button,
-.secondary-upload-button {
+.secondary-upload-button,
+.analyze-button {
   display: inline-flex;
+
   align-items: center;
   justify-content: center;
 
@@ -166,15 +162,17 @@
   font-weight: 650;
 
   cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease,
+    opacity 0.2s ease;
 }
 
 .upload-button {
   background: var(--agri-green-700);
-  color: white;
 
-  transition:
-    background 0.2s ease,
-    transform 0.2s ease;
+  color: white;
 }
 
 .upload-button:hover {
@@ -185,19 +183,34 @@
 
 .secondary-upload-button {
   background: var(--agri-green-100);
+
   color: var(--agri-green-700);
 }
 
-/* =========================================================
-   File Hint
-   ========================================================= */
+.secondary-upload-button:hover {
+  background: var(--agri-green-200);
 
-.upload-hint {
-  margin-top: 14px;
+  transform: translateY(-1px);
+}
 
-  color: var(--text-muted);
+.analyze-button {
+  border: none;
 
-  font-size: 10px;
+  background: var(--agri-green-700);
+
+  color: white;
+}
+
+.analyze-button:hover:not(:disabled) {
+  background: var(--agri-green-900);
+
+  transform: translateY(-1px);
+}
+
+.analyze-button:disabled {
+  opacity: 0.65;
+
+  cursor: not-allowed;
 }
 
 /* =========================================================
@@ -205,6 +218,8 @@
    ========================================================= */
 
 .image-preview-container {
+  width: 100%;
+
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -213,8 +228,8 @@
 }
 
 .image-preview {
-  width: 260px;
-  height: 190px;
+  width: 300px;
+  height: 210px;
 
   object-fit: cover;
 
@@ -238,11 +253,363 @@
   white-space: nowrap;
 }
 
+.image-actions {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 10px;
+
+  flex-wrap: wrap;
+}
+
+/* =========================================================
+   Loading
+   ========================================================= */
+
+.analysis-loading {
+  display: flex;
+
+  align-items: center;
+
+  gap: 9px;
+
+  margin-top: 8px;
+
+  color: var(--text-secondary);
+
+  font-size: 12px;
+}
+
+.loading-spinner {
+  width: 15px;
+  height: 15px;
+
+  border: 2px solid var(--agri-green-100);
+  border-top-color: var(--agri-green-700);
+
+  border-radius: 50%;
+
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* =========================================================
+   Result Card
+   ========================================================= */
+
+.disease-result-card {
+  width: min(100%, 560px);
+
+  margin-top: 14px;
+
+  padding: 24px;
+
+  background: var(--surface-white);
+
+  border: 1px solid var(--border-light);
+
+  border-radius: 16px;
+
+  text-align: left;
+
+  box-shadow: var(--shadow-sm);
+
+  animation: resultAppear 0.3s ease;
+}
+
+@keyframes resultAppear {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.result-header {
+  display: flex;
+
+  align-items: center;
+
+  gap: 14px;
+
+  margin-bottom: 22px;
+}
+
+.result-status-icon {
+  width: 44px;
+  height: 44px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 12px;
+
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.result-status-icon.healthy {
+  background: var(--agri-green-100);
+
+  color: var(--agri-green-700);
+}
+
+.result-status-icon.disease {
+  background: #fff1e8;
+
+  color: #b45309;
+}
+
+.result-eyebrow {
+  display: block;
+
+  margin-bottom: 3px;
+
+  color: var(--text-muted);
+
+  font-size: 9px;
+  font-weight: 750;
+
+  letter-spacing: 0.8px;
+}
+
+.result-header h3 {
+  margin: 0;
+
+  color: var(--text-primary);
+
+  font-size: 22px;
+  font-weight: 750;
+}
+
+/* =========================================================
+   Confidence
+   ========================================================= */
+
+.confidence-section {
+  margin-bottom: 18px;
+}
+
+.confidence-header {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 8px;
+
+  color: var(--text-secondary);
+
+  font-size: 12px;
+}
+
+.confidence-header strong {
+  color: var(--text-primary);
+
+  font-size: 15px;
+}
+
+.confidence-track {
+  width: 100%;
+  height: 8px;
+
+  overflow: hidden;
+
+  background: var(--agri-green-100);
+
+  border-radius: 999px;
+}
+
+.confidence-fill {
+  height: 100%;
+
+  border-radius: 999px;
+
+  transition: width 0.5s ease;
+}
+
+.confidence-fill.high {
+  background: var(--agri-green-700);
+}
+
+.confidence-fill.moderate {
+  background: #d97706;
+}
+
+.confidence-fill.low {
+  background: #dc2626;
+}
+
+.confidence-label {
+  display: block;
+
+  margin-top: 6px;
+
+  font-size: 10px;
+  font-weight: 650;
+}
+
+.confidence-label.high {
+  color: var(--agri-green-700);
+}
+
+.confidence-label.moderate {
+  color: #b45309;
+}
+
+.confidence-label.low {
+  color: #dc2626;
+}
+
+/* =========================================================
+   Recommendation
+   ========================================================= */
+
+.recommendation-box {
+  padding: 14px 16px;
+
+  background: var(--agri-green-100);
+
+  border-radius: 12px;
+}
+
+.recommendation-title {
+  display: block;
+
+  margin-bottom: 5px;
+
+  color: var(--agri-green-700);
+
+  font-size: 10px;
+  font-weight: 750;
+
+  letter-spacing: 0.6px;
+
+  text-transform: uppercase;
+}
+
+.recommendation-box p {
+  margin: 0;
+
+  color: var(--text-primary);
+
+  font-size: 12px;
+
+  line-height: 1.6;
+}
+
+/* =========================================================
+   Confidence Warning
+   ========================================================= */
+
+.confidence-warning {
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 9px;
+
+  margin-top: 12px;
+
+  padding: 12px 14px;
+
+  background: #fff8eb;
+
+  border: 1px solid #f5d89a;
+
+  border-radius: 10px;
+
+  color: #92400e;
+
+  text-align: left;
+}
+
+.confidence-warning span {
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.confidence-warning p {
+  margin: 0;
+
+  font-size: 11px;
+
+  line-height: 1.5;
+}
+
+/* =========================================================
+   Error
+   ========================================================= */
+
+.disease-error {
+  width: min(100%, 560px);
+
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 9px;
+
+  margin-top: 14px;
+
+  padding: 12px 14px;
+
+  background: #fff1f2;
+
+  border: 1px solid #fecdd3;
+
+  border-radius: 10px;
+
+  color: #be123c;
+
+  text-align: left;
+}
+
+.disease-error span {
+  font-weight: 800;
+}
+
+.disease-error p {
+  margin: 0;
+
+  font-size: 11px;
+
+  line-height: 1.5;
+}
+
+/* =========================================================
+   File Hint
+   ========================================================= */
+
+.upload-hint {
+  margin-top: 14px;
+
+  color: var(--text-muted);
+
+  font-size: 10px;
+}
+
 /* =========================================================
    Mobile
    ========================================================= */
 
 @media (max-width: 600px) {
+
   .disease-heading h1 {
     font-size: 23px;
   }
@@ -254,7 +621,20 @@
   }
 
   .image-preview {
-    width: 220px;
-    height: 165px;
+    width: 240px;
+    height: 175px;
+  }
+
+  .disease-result-card {
+    padding: 18px;
+  }
+
+  .image-actions {
+    flex-direction: column;
+  }
+
+  .secondary-upload-button,
+  .analyze-button {
+    width: 100%;
   }
 }
