@@ -1,7 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.v1.router import api_router
+from app.api.v1.auth import router as auth_router
+from app.api.v1.crops import router as crops_router
+from app.api.v1.disease import router as disease_router
+from app.api.v1.farms import router as farms_router
+from app.api.v1.market import router as market_router
 
 
 app = FastAPI(
@@ -24,7 +28,27 @@ app.add_middleware(
 
 
 app.include_router(
-    api_router,
+    auth_router,
+    prefix="/api/v1",
+)
+
+app.include_router(
+    farms_router,
+    prefix="/api/v1",
+)
+
+app.include_router(
+    crops_router,
+    prefix="/api/v1",
+)
+
+app.include_router(
+    disease_router,
+    prefix="/api/v1",
+)
+
+app.include_router(
+    market_router,
     prefix="/api/v1",
 )
 
