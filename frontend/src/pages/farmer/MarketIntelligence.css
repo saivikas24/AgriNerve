@@ -647,3 +647,94 @@
     font-size: 38px;
   }
 }
+
+/* =========================================================
+   MARKET PRICE CHART — DATE AXIS
+   ========================================================= */
+
+.chart-svg-container {
+  width: 100%;
+  overflow: hidden;
+}
+
+.chart-date-axis {
+  display: grid;
+  grid-template-columns: repeat(
+    14,
+    minmax(0, 1fr)
+  );
+
+  align-items: center;
+
+  width: 100%;
+
+  margin-top: 8px;
+
+  padding: 0 30px;
+
+  box-sizing: border-box;
+}
+
+.chart-date-label {
+  text-align: center;
+
+  font-size: 11px;
+
+  font-weight: 600;
+
+  color: #78857e;
+
+  white-space: nowrap;
+}
+
+.chart-date-empty {
+  display: block;
+}
+
+.chart-range {
+  display: flex;
+
+  justify-content: space-between;
+
+  margin-top: 10px;
+
+  padding: 0 2px;
+
+  font-size: 10px;
+
+  color: #a0aaa5;
+
+  font-weight: 500;
+}
+
+/* Make the points feel interactive */
+
+.chart-point {
+  cursor: pointer;
+
+  transition:
+    r 0.15s ease,
+    stroke-width 0.15s ease;
+}
+
+.chart-point:hover {
+  r: 6;
+}
+
+/* Responsive */
+
+@media (max-width: 768px) {
+
+  .chart-date-axis {
+    padding: 0 15px;
+  }
+
+  .chart-date-label {
+    font-size: 9px;
+  }
+
+  .chart-range {
+    font-size: 9px;
+  }
+
+}

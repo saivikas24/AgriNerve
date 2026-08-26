@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+﻿from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.v1.auth import router as auth_router
@@ -6,6 +6,7 @@ from app.api.v1.crops import router as crops_router
 from app.api.v1.disease import router as disease_router
 from app.api.v1.farms import router as farms_router
 from app.api.v1.market import router as market_router
+from app.api.v1.water import router as water_router
 
 
 app = FastAPI(
@@ -49,6 +50,11 @@ app.include_router(
 
 app.include_router(
     market_router,
+    prefix="/api/v1",
+)
+
+app.include_router(
+    water_router,
     prefix="/api/v1",
 )
 

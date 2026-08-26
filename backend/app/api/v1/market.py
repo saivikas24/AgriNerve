@@ -6,7 +6,17 @@ from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.models.market_price import MarketPrice
-from app.schemas.market import MarketPriceResponse
+from app.schemas.market import (
+    MarketPriceResponse,
+    MarketForecastResponse,
+)
+from app.services.variety_service import (
+    normalize_variety,
+    raw_varieties_for_canonical,
+)
+from app.services.market_forecast_service import (
+    build_market_forecast,
+)
 
 
 router = APIRouter(
@@ -49,7 +59,6 @@ def get_varieties(
             MarketPrice.state == "Andhra Pradesh",
             MarketPrice.commodity == "Paddy(Common)",
         )
-        .distinct()
     )
 
     if market:
@@ -57,9 +66,18 @@ def get_varieties(
             MarketPrice.market == market
         )
 
-    query = query.order_by(MarketPrice.variety)
+    raw_varieties = db.scalars(
+        query.distinct().order_by(
+            MarketPrice.variety
+        )
+    ).all()
 
-    return db.scalars(query).all()
+    canonical_varieties = {
+        normalize_variety(variety)
+        for variety in raw_varieties
+    }
+
+    return sorted(canonical_varieties)
 
 
 @router.get(
@@ -89,8 +107,12 @@ def get_market_prices(
         )
 
     if variety:
+        raw_varieties = raw_varieties_for_canonical(
+            variety
+        )
+
         query = query.where(
-            MarketPrice.variety == variety
+            MarketPrice.variety.in_(raw_varieties)
         )
 
     if start_date:
@@ -113,3 +135,29 @@ def get_market_prices(
     )
 
     return db.scalars(query).all()
+
+
+@router.get(
+    "/forecast",
+    response_model=MarketForecastResponse,
+)
+def get_market_forecast(
+    market: str = Query(...),
+    variety: str = Query(...),
+    db: Session = Depends(get_db),
+):
+    forecast = build_market_forecast(
+        db,
+        market,
+        variety,
+    )
+
+    if forecast is None:
+        return {
+            "error": (
+                "No market data found for "
+                "the selected market and variety."
+            )
+        }
+
+    return forecast

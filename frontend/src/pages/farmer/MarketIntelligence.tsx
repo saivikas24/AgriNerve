@@ -16,39 +16,73 @@ interface MarketPrice {
   fetched_at: string;
 }
 
-const API_BASE = "http://127.0.0.1:8000/api/v1/market";
+interface MarketForecast {
+  market: string;
+  variety: string;
+  current_date: string;
+  current_price: number;
+  forecast_date: string;
+  forecast_price: number;
+  expected_change: number;
+  expected_change_percent: number;
+  trend: string;
+  forecast_horizon_days: number;
+  method: string;
+}
+
+const API_BASE =
+  "http://127.0.0.1:8000/api/v1/market";
 
 function MarketIntelligence() {
   const [data, setData] = useState<MarketPrice[]>([]);
 
-  const [markets, setMarkets] = useState<string[]>([]);
-  const [varieties, setVarieties] = useState<string[]>([]);
+  const [markets, setMarkets] = useState<string[]>(
+    [],
+  );
+
+  const [varieties, setVarieties] = useState<
+    string[]
+  >([]);
 
   const [market, setMarket] = useState("");
   const [variety, setVariety] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
-  const [isLoading, setIsLoading] = useState(true);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [forecast, setForecast] =
+    useState<MarketForecast | null>(null);
+
+  const [isLoading, setIsLoading] =
+    useState(true);
+
+  const [isAnalyzing, setIsAnalyzing] =
+    useState(false);
+
   const [isLoadingVarieties, setIsLoadingVarieties] =
     useState(false);
+
+  const [isLoadingForecast, setIsLoadingForecast] =
+    useState(false);
+
   const [error, setError] = useState("");
 
   // ---------------------------------------------------------
-  // Load all markets and initial varieties
+  // Load markets and initial varieties
   // ---------------------------------------------------------
+
   useEffect(() => {
     const loadFilterMetadata = async () => {
       try {
         setIsLoading(true);
         setError("");
 
-        const [marketsResponse, varietiesResponse] =
-          await Promise.all([
-            fetch(`${API_BASE}/markets`),
-            fetch(`${API_BASE}/varieties`),
-          ]);
+        const [
+          marketsResponse,
+          varietiesResponse,
+        ] = await Promise.all([
+          fetch(`${API_BASE}/markets`),
+          fetch(`${API_BASE}/varieties`),
+        ]);
 
         if (!marketsResponse.ok) {
           throw new Error(
@@ -92,6 +126,7 @@ function MarketIntelligence() {
   // ---------------------------------------------------------
   // Load varieties whenever market changes
   // ---------------------------------------------------------
+
   useEffect(() => {
     const loadMarketVarieties = async () => {
       try {
@@ -118,13 +153,12 @@ function MarketIntelligence() {
 
         setVarieties(result);
 
-        // If currently selected variety doesn't exist
-        // in the selected market, clear it.
         if (
           variety &&
           !result.includes(variety)
         ) {
           setVariety("");
+          setForecast(null);
         }
       } catch (err) {
         console.error(
@@ -148,8 +182,82 @@ function MarketIntelligence() {
   }, [market]);
 
   // ---------------------------------------------------------
+  // Fetch forecast
+  // ---------------------------------------------------------
+
+  const fetchForecast = async (
+    selectedMarket = market,
+    selectedVariety = variety,
+  ) => {
+    if (
+      !selectedMarket.trim() ||
+      !selectedVariety.trim()
+    ) {
+      setForecast(null);
+      return;
+    }
+
+    setIsLoadingForecast(true);
+
+    try {
+      const params = new URLSearchParams();
+
+      params.set(
+        "market",
+        selectedMarket.trim(),
+      );
+
+      params.set(
+        "variety",
+        selectedVariety.trim(),
+      );
+
+      const response = await fetch(
+        `${API_BASE}/forecast?${params.toString()}`,
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          `Forecast API returned ${response.status}`,
+        );
+      }
+
+      const result: MarketForecast =
+        await response.json();
+
+      if (
+        !result ||
+        typeof result.forecast_price !==
+          "number"
+      ) {
+        throw new Error(
+          "Forecast API returned an unexpected response.",
+        );
+      }
+
+      setForecast(result);
+    } catch (err) {
+      console.error(
+        "FORECAST API ERROR:",
+        err,
+      );
+
+      setForecast(null);
+
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Unable to load market forecast.",
+      );
+    } finally {
+      setIsLoadingForecast(false);
+    }
+  };
+
+  // ---------------------------------------------------------
   // Fetch filtered market prices
   // ---------------------------------------------------------
+
   const fetchPrices = async (
     selectedMarket = market,
     selectedVariety = variety,
@@ -216,11 +324,6 @@ function MarketIntelligence() {
       const result: MarketPrice[] =
         await response.json();
 
-      console.log(
-        "MARKET API RESPONSE:",
-        result,
-      );
-
       if (!Array.isArray(result)) {
         throw new Error(
           "Market API returned an unexpected response.",
@@ -228,6 +331,11 @@ function MarketIntelligence() {
       }
 
       setData(result);
+
+      await fetchForecast(
+        selectedMarket,
+        selectedVariety,
+      );
     } catch (err) {
       console.error(
         "MARKET API ERROR:",
@@ -235,6 +343,7 @@ function MarketIntelligence() {
       );
 
       setData([]);
+      setForecast(null);
 
       setError(
         err instanceof Error
@@ -247,20 +356,28 @@ function MarketIntelligence() {
   };
 
   // ---------------------------------------------------------
-  // Reset everything
+  // Reset
   // ---------------------------------------------------------
+
   const resetFilters = () => {
     setMarket("");
     setVariety("");
     setStartDate("");
     setEndDate("");
+    setForecast(null);
 
-    fetchPrices("", "", "", "");
+    fetchPrices(
+      "",
+      "",
+      "",
+      "",
+    );
   };
 
   // ---------------------------------------------------------
   // Analytics
   // ---------------------------------------------------------
+
   const latest = data[0];
 
   const averageModal = useMemo(() => {
@@ -284,8 +401,12 @@ function MarketIntelligence() {
 
     const sorted = [...data].sort(
       (a, b) =>
-        new Date(b.arrival_date).getTime() -
-        new Date(a.arrival_date).getTime(),
+        new Date(
+          b.arrival_date,
+        ).getTime() -
+        new Date(
+          a.arrival_date,
+        ).getTime(),
     );
 
     const latestPrice =
@@ -305,15 +426,72 @@ function MarketIntelligence() {
     );
   }, [data]);
 
+  // ---------------------------------------------------------
+  // Chart data
+  // ---------------------------------------------------------
+
   const chartData = useMemo(() => {
     return [...data]
       .sort(
         (a, b) =>
-          new Date(a.arrival_date).getTime() -
-          new Date(b.arrival_date).getTime(),
+          new Date(
+            a.arrival_date,
+          ).getTime() -
+          new Date(
+            b.arrival_date,
+          ).getTime(),
       )
       .slice(-14);
   }, [data]);
+
+  // ---------------------------------------------------------
+  // Format chart date
+  // Example:
+  // 2026-08-11 -> 11 Aug
+  // ---------------------------------------------------------
+
+  const formatChartDate = (
+    dateString: string,
+  ) => {
+    const date = new Date(
+      `${dateString}T00:00:00`,
+    );
+
+    return date.toLocaleDateString(
+      "en-IN",
+      {
+        day: "2-digit",
+        month: "short",
+      },
+    );
+  };
+
+  // ---------------------------------------------------------
+  // Full date for tooltip
+  // Example:
+  // 11 Aug 2026
+  // ---------------------------------------------------------
+
+  const formatFullDate = (
+    dateString: string,
+  ) => {
+    const date = new Date(
+      `${dateString}T00:00:00`,
+    );
+
+    return date.toLocaleDateString(
+      "en-IN",
+      {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      },
+    );
+  };
+
+  // ---------------------------------------------------------
+  // Chart points
+  // ---------------------------------------------------------
 
   const chartPoints = useMemo(() => {
     if (!chartData.length) {
@@ -330,6 +508,7 @@ function MarketIntelligence() {
 
     const min = Math.min(...prices);
     const max = Math.max(...prices);
+
     const range = max - min || 1;
 
     return chartData
@@ -355,24 +534,75 @@ function MarketIntelligence() {
       .join(" ");
   }, [chartData]);
 
+  // ---------------------------------------------------------
+  // Chart filled area
+  // ---------------------------------------------------------
+
+  const chartAreaPoints = useMemo(() => {
+    if (!chartPoints) {
+      return "";
+    }
+
+    return `30,210 ${chartPoints} 730,210`;
+  }, [chartPoints]);
+
+  // ---------------------------------------------------------
+  // Forecast formatting
+  // ---------------------------------------------------------
+
+  const formattedForecastDate =
+    forecast
+      ? new Date(
+          `${forecast.forecast_date}T00:00:00`,
+        ).toLocaleDateString(
+          "en-IN",
+          {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+          },
+        )
+      : "";
+
+  const forecastTrendClass =
+    forecast?.trend === "rising"
+      ? "positive"
+      : forecast?.trend === "falling"
+        ? "negative"
+        : "";
+
+  // ---------------------------------------------------------
+  // Render
+  // ---------------------------------------------------------
+
   return (
     <div className="market-page">
+
+      {/* =====================================================
+          HERO
+          ===================================================== */}
 
       <section className="market-hero">
 
         <div>
 
           <div className="market-eyebrow">
+
             <span className="live-dot" />
+
             LIVE MARKET INTELLIGENCE
+
           </div>
 
           <h1>
+
             Know the market.
             <br />
+
             <span>
               Sell with confidence.
             </span>
+
           </h1>
 
           <p>
@@ -385,7 +615,9 @@ function MarketIntelligence() {
 
         <div className="market-hero-badge">
 
-          <span>DATA SOURCE</span>
+          <span>
+            DATA SOURCE
+          </span>
 
           <strong>
             AGMARKNET
@@ -398,6 +630,10 @@ function MarketIntelligence() {
         </div>
 
       </section>
+
+      {/* =====================================================
+          FILTERS
+          ===================================================== */}
 
       <section className="market-filter-card">
 
@@ -427,6 +663,8 @@ function MarketIntelligence() {
 
         <div className="filter-grid">
 
+          {/* MARKET */}
+
           <label className="filter-field">
 
             <span>
@@ -439,7 +677,10 @@ function MarketIntelligence() {
                 setMarket(
                   event.target.value,
                 );
+
                 setVariety("");
+
+                setForecast(null);
               }}
               disabled={
                 isLoading ||
@@ -464,6 +705,8 @@ function MarketIntelligence() {
 
           </label>
 
+          {/* VARIETY */}
+
           <label className="filter-field">
 
             <span>
@@ -472,11 +715,13 @@ function MarketIntelligence() {
 
             <select
               value={variety}
-              onChange={(event) =>
+              onChange={(event) => {
                 setVariety(
                   event.target.value,
-                )
-              }
+                );
+
+                setForecast(null);
+              }}
               disabled={
                 isLoading ||
                 isLoadingVarieties
@@ -502,6 +747,8 @@ function MarketIntelligence() {
 
           </label>
 
+          {/* FROM */}
+
           <label className="filter-field">
 
             <span>
@@ -520,6 +767,8 @@ function MarketIntelligence() {
 
           </label>
 
+          {/* TO */}
+
           <label className="filter-field">
 
             <span>
@@ -537,6 +786,8 @@ function MarketIntelligence() {
             />
 
           </label>
+
+          {/* ANALYZE */}
 
           <button
             type="button"
@@ -564,7 +815,12 @@ function MarketIntelligence() {
 
       </section>
 
+      {/* =====================================================
+          ERROR
+          ===================================================== */}
+
       {error && (
+
         <div className="market-error">
 
           <strong>
@@ -585,7 +841,12 @@ function MarketIntelligence() {
           </button>
 
         </div>
+
       )}
+
+      {/* =====================================================
+          LOADING / DATA
+          ===================================================== */}
 
       {isAnalyzing ? (
 
@@ -599,7 +860,7 @@ function MarketIntelligence() {
 
           <p>
             Fetching the latest AGMARKNET
-            observations...
+            observations and forecast...
           </p>
 
         </div>
@@ -613,9 +874,8 @@ function MarketIntelligence() {
           </h3>
 
           <p>
-            No AGMARKNET records match the
-            selected market, variety and
-            date range.
+            Select a market and variety,
+            then click Analyze.
           </p>
 
           <button
@@ -632,7 +892,13 @@ function MarketIntelligence() {
 
         <>
 
+          {/* =================================================
+              PRICE CARDS
+              ================================================= */}
+
           <section className="price-grid">
+
+            {/* MODAL */}
 
             <article className="price-card featured">
 
@@ -649,13 +915,16 @@ function MarketIntelligence() {
                       : "trend negative"
                   }
                 >
+
                   {priceChange >= 0
                     ? "\u2197"
                     : "\u2198"}{" "}
+
                   {Math.abs(
                     priceChange,
                   ).toFixed(1)}
                   %
+
                 </span>
 
               </div>
@@ -677,11 +946,15 @@ function MarketIntelligence() {
               </p>
 
               <div className="price-card-footer">
+
                 Latest reported modal
                 market price
+
               </div>
 
             </article>
+
+            {/* MINIMUM */}
 
             <article className="price-card">
 
@@ -715,6 +988,8 @@ function MarketIntelligence() {
 
             </article>
 
+            {/* MAXIMUM */}
+
             <article className="price-card">
 
               <div className="price-card-top">
@@ -747,6 +1022,8 @@ function MarketIntelligence() {
 
             </article>
 
+            {/* AVERAGE */}
+
             <article className="price-card">
 
               <div className="price-card-top">
@@ -765,28 +1042,32 @@ function MarketIntelligence() {
 
                 {"\u20B9"}
 
-                {averageModal
-                  ? averageModal.toLocaleString(
-                      "en-IN",
-                      {
-                        maximumFractionDigits: 0,
-                      },
-                    )
-                  : "—"}
+                {averageModal.toLocaleString(
+                  "en-IN",
+                  {
+                    maximumFractionDigits: 0,
+                  },
+                )}
 
               </div>
 
               <p>
-                across{" "}
-                {data.length.toLocaleString()}{" "}
-                records
+                selected observations
               </p>
 
             </article>
 
           </section>
 
+          {/* =================================================
+              MAIN CONTENT
+              ================================================= */}
+
           <section className="market-main-grid">
+
+            {/* =================================================
+                PRICE HISTORY CHART
+                ================================================= */}
 
             <article className="chart-card">
 
@@ -795,147 +1076,283 @@ function MarketIntelligence() {
                 <div>
 
                   <span className="section-kicker">
-                    PRICE MOVEMENT
+                    PRICE HISTORY
                   </span>
 
                   <h2>
-                    Modal price trend
+                    Recent modal price movement
                   </h2>
 
                 </div>
 
                 <span className="chart-period">
-                  Last{" "}
-                  {chartData.length}{" "}
-                  observations
+                  LAST 14 OBSERVATIONS
                 </span>
 
               </div>
 
-              {chartData.length > 1 ? (
+              <div className="chart-wrapper">
 
-                <div className="chart-wrapper">
+                {chartData.length > 0 ? (
 
-                  <svg
-                    viewBox="0 0 760 240"
-                    preserveAspectRatio="none"
-                    className="price-chart"
-                  >
+                  <>
 
-                    <line
-                      x1="30"
-                      y1="30"
-                      x2="730"
-                      y2="30"
-                      className="chart-grid-line"
-                    />
+                    {/* SVG GRAPH */}
 
-                    <line
-                      x1="30"
-                      y1="120"
-                      x2="730"
-                      y2="120"
-                      className="chart-grid-line"
-                    />
+                    <div className="chart-svg-container">
 
-                    <line
-                      x1="30"
-                      y1="210"
-                      x2="730"
-                      y2="210"
-                      className="chart-grid-line"
-                    />
+                      <svg
+                        className="price-chart"
+                        viewBox="0 0 760 240"
+                        preserveAspectRatio="none"
+                      >
 
-                    <polyline
-                      points={
-                        chartPoints
-                      }
-                      className="chart-line"
-                    />
+                        <defs>
 
-                    {chartData.map(
-                      (item, index) => {
+                          <linearGradient
+                            id="priceArea"
+                            x1="0"
+                            y1="0"
+                            x2="0"
+                            y2="1"
+                          >
 
-                        const prices =
-                          chartData.map(
-                            (point) =>
-                              point.modal_price,
-                          );
+                            <stop
+                              offset="0%"
+                              stopColor="#2d8050"
+                              stopOpacity="0.18"
+                            />
 
-                        const min =
-                          Math.min(
-                            ...prices,
-                          );
+                            <stop
+                              offset="100%"
+                              stopColor="#2d8050"
+                              stopOpacity="0"
+                            />
 
-                        const max =
-                          Math.max(
-                            ...prices,
-                          );
+                          </linearGradient>
 
-                        const range =
-                          max - min || 1;
+                        </defs>
 
-                        const x =
-                          30 +
-                          (index /
-                            Math.max(
+                        {/* GRID */}
+
+                        <line
+                          className="chart-grid-line"
+                          x1="30"
+                          y1="30"
+                          x2="730"
+                          y2="30"
+                        />
+
+                        <line
+                          className="chart-grid-line"
+                          x1="30"
+                          y1="90"
+                          x2="730"
+                          y2="90"
+                        />
+
+                        <line
+                          className="chart-grid-line"
+                          x1="30"
+                          y1="150"
+                          x2="730"
+                          y2="150"
+                        />
+
+                        <line
+                          className="chart-grid-line"
+                          x1="30"
+                          y1="210"
+                          x2="730"
+                          y2="210"
+                        />
+
+                        {/* AREA */}
+
+                        <polygon
+                          className="chart-area"
+                          points={chartAreaPoints}
+                        />
+
+                        {/* PRICE LINE */}
+
+                        <polyline
+                          className="chart-line"
+                          points={chartPoints}
+                        />
+
+                        {/* POINTS */}
+
+                        {chartData.map(
+                          (
+                            item,
+                            index,
+                          ) => {
+
+                            const prices =
+                              chartData.map(
+                                (row) =>
+                                  row.modal_price,
+                              );
+
+                            const min =
+                              Math.min(
+                                ...prices,
+                              );
+
+                            const max =
+                              Math.max(
+                                ...prices,
+                              );
+
+                            const range =
+                              max - min || 1;
+
+                            const x =
+                              30 +
+                              (index /
+                                Math.max(
+                                  chartData.length -
+                                    1,
+                                  1,
+                                )) *
+                                700;
+
+                            const y =
+                              210 -
+                              ((item.modal_price -
+                                min) /
+                                range) *
+                                180;
+
+                            return (
+                              <circle
+                                key={`${item.id}-${index}`}
+                                className="chart-point"
+                                cx={x}
+                                cy={y}
+                                r="4"
+                              >
+
+                                {/* Hover information */}
+
+                                <title>
+                                  {formatFullDate(
+                                    item.arrival_date,
+                                  )}
+
+                                  {"\n"}
+
+                                  Modal Price: ₹
+                                  {item.modal_price.toLocaleString(
+                                    "en-IN",
+                                  )}
+
+                                </title>
+
+                              </circle>
+                            );
+                          },
+                        )}
+
+                      </svg>
+
+                    </div>
+
+                    {/* =================================================
+                        DATE AXIS
+                        ================================================= */}
+
+                    <div className="chart-date-axis">
+
+                      {chartData.map(
+                        (
+                          item,
+                          index,
+                        ) => {
+
+                          /*
+                           * If there are <= 8 observations,
+                           * show every date.
+                           *
+                           * If there are more than 8,
+                           * show alternate dates and
+                           * always show the final date.
+                           */
+
+                          const showLabel =
+                            chartData.length <=
+                              8 ||
+                            index % 2 === 0 ||
+                            index ===
                               chartData.length -
-                                1,
-                              1,
-                            )) *
-                            700;
+                                1;
 
-                        const y =
-                          210 -
-                          ((item.modal_price -
-                            min) /
-                            range) *
-                            180;
+                          if (!showLabel) {
+                            return (
+                              <span
+                                key={`empty-${item.id}`}
+                                className="chart-date-empty"
+                              />
+                            );
+                          }
 
-                        return (
-                          <circle
-                            key={item.id}
-                            cx={x}
-                            cy={y}
-                            r="4"
-                            className="chart-point"
-                          />
-                        );
-                      },
-                    )}
+                          return (
+                            <span
+                              key={item.id}
+                              className="chart-date-label"
+                            >
+                              {formatChartDate(
+                                item.arrival_date,
+                              )}
+                            </span>
+                          );
+                        },
+                      )}
 
-                  </svg>
+                    </div>
 
-                  <div className="chart-labels">
+                    {/* =================================================
+                        EXACT RANGE
+                        ================================================= */}
 
-                    {chartData
-                      .filter(
-                        (_, index) =>
-                          index === 0 ||
-                          index ===
+                    <div className="chart-range">
+
+                      <span>
+                        {chartData[0]
+                          .arrival_date}
+                      </span>
+
+                      <span>
+                        {
+                          chartData[
                             chartData.length -
-                              1,
-                      )
-                      .map((item) => (
-                        <span key={item.id}>
-                          {item.arrival_date}
-                        </span>
-                      ))}
+                              1
+                          ].arrival_date
+                        }
+                      </span>
+
+                    </div>
+
+                  </>
+
+                ) : (
+
+                  <div className="empty-chart">
+
+                    No chart data available.
 
                   </div>
 
-                </div>
+                )}
 
-              ) : (
-
-                <div className="empty-chart">
-                  Not enough observations
-                  for a trend.
-                </div>
-
-              )}
+              </div>
 
             </article>
+
+            {/* =================================================
+                MARKET SNAPSHOT
+                ================================================= */}
 
             <article className="snapshot-card">
 
@@ -948,7 +1365,7 @@ function MarketIntelligence() {
                   </span>
 
                   <h2>
-                    Current signal
+                    Current observation
                   </h2>
 
                 </div>
@@ -958,18 +1375,21 @@ function MarketIntelligence() {
               <div className="snapshot-location">
 
                 <div className="location-icon">
-                  {"\u25CE"}
+                  {"\u2302"}
                 </div>
 
                 <div>
 
                   <strong>
-                    {latest?.market ||
+                    {market ||
+                      latest?.market ||
                       "All markets"}
                   </strong>
 
                   <span>
-                    Andhra Pradesh
+                    {variety ||
+                      latest?.variety ||
+                      "All varieties"}
                   </span>
 
                 </div>
@@ -981,24 +1401,11 @@ function MarketIntelligence() {
               <div className="snapshot-row">
 
                 <span>
-                  Commodity
+                  Latest date
                 </span>
 
                 <strong>
-                  {latest?.commodity ||
-                    "Paddy(Common)"}
-                </strong>
-
-              </div>
-
-              <div className="snapshot-row">
-
-                <span>
-                  Variety
-                </span>
-
-                <strong>
-                  {latest?.variety ||
+                  {latest?.arrival_date ||
                     "—"}
                 </strong>
 
@@ -1007,12 +1414,14 @@ function MarketIntelligence() {
               <div className="snapshot-row">
 
                 <span>
-                  Latest arrivals
+                  Modal price
                 </span>
 
                 <strong>
                   {latest
-                    ? `${latest.arrivals_mt} MT`
+                    ? `\u20B9${latest.modal_price.toLocaleString(
+                        "en-IN",
+                      )}`
                     : "—"}
                 </strong>
 
@@ -1021,11 +1430,28 @@ function MarketIntelligence() {
               <div className="snapshot-row">
 
                 <span>
-                  Records analyzed
+                  Arrivals
                 </span>
 
                 <strong>
-                  {data.length.toLocaleString()}
+                  {latest
+                    ? `${latest.arrivals_mt.toLocaleString(
+                        "en-IN",
+                      )} MT`
+                    : "—"}
+                </strong>
+
+              </div>
+
+              <div className="snapshot-row">
+
+                <span>
+                  Source
+                </span>
+
+                <strong>
+                  {latest?.source ||
+                    "AGMARKNET"}
                 </strong>
 
               </div>
@@ -1034,7 +1460,8 @@ function MarketIntelligence() {
 
                 <span className="source-dot" />
 
-                Verified source · AGMARKNET
+                Government market
+                observation
 
               </div>
 
@@ -1042,28 +1469,160 @@ function MarketIntelligence() {
 
           </section>
 
+          {/* =================================================
+              7-DAY FORECAST
+              ================================================= */}
+
+          {market && variety && (
+
+            <section className="decision-banner">
+
+              <div className="decision-icon">
+                {"\u2192"}
+              </div>
+
+              <div>
+
+                <h2>
+                  7-Day Market Forecast
+                </h2>
+
+                {isLoadingForecast ? (
+
+                  <p>
+                    Calculating the latest
+                    forecast...
+                  </p>
+
+                ) : forecast ? (
+
+                  <p>
+
+                    Current modal price is{" "}
+
+                    <strong>
+                      {"\u20B9"}
+                      {forecast.current_price.toLocaleString(
+                        "en-IN",
+                      )}
+                    </strong>
+
+                    . The baseline forecast for{" "}
+
+                    <strong>
+                      {formattedForecastDate}
+                    </strong>
+
+                    {" "}is{" "}
+
+                    <strong>
+                      {"\u20B9"}
+                      {forecast.forecast_price.toLocaleString(
+                        "en-IN",
+                      )}
+                    </strong>
+
+                    {" "}per quintal.
+
+                  </p>
+
+                ) : (
+
+                  <p>
+                    Forecast is unavailable
+                    for this market and variety.
+                  </p>
+
+                )}
+
+              </div>
+
+              {forecast && (
+
+                <div className="decision-status">
+
+                  <span>
+                    {forecast.forecast_horizon_days}
+                    -DAY TREND
+                  </span>
+
+                  <strong
+                    className={
+                      forecastTrendClass
+                    }
+                  >
+
+                    {forecast.trend
+                      .charAt(0)
+                      .toUpperCase() +
+                      forecast.trend.slice(1)}
+
+                  </strong>
+
+                  <small
+                    style={{
+                      display: "block",
+                      marginTop: "5px",
+                      color: "#7d8982",
+                    }}
+                  >
+
+                    {forecast.expected_change >=
+                    0
+                      ? "+"
+                      : ""}
+
+                    {"\u20B9"}
+
+                    {forecast.expected_change.toLocaleString(
+                      "en-IN",
+                    )}
+
+                    {" "}
+
+                    (
+                    {forecast.expected_change_percent.toFixed(
+                      2,
+                    )}
+                    %)
+
+                  </small>
+
+                </div>
+
+              )}
+
+            </section>
+
+          )}
+
+          {/* =================================================
+              DECISION NOTE
+              ================================================= */}
+
           <section className="decision-banner">
 
             <div className="decision-icon">
-              {"\u2726"}
+              {"\u2713"}
             </div>
 
             <div>
 
-              <span className="section-kicker">
-                NEXT-GENERATION DECISION SUPPORT
-              </span>
-
               <h2>
-                AI price prediction is coming next.
+                Market intelligence, not just
+                market data.
               </h2>
 
               <p>
-                AgriNerve will combine historical
-                prices, arrivals and market signals
-                to estimate future price movement
-                and help farmers decide when and
-                where to sell.
+
+                AgriNerve combines the latest
+                market observations with a
+                validated forecasting baseline.
+                The current production forecast
+                uses the latest modal price because
+                it outperformed the tested machine
+                learning models for this dataset.
+
               </p>
 
             </div>
@@ -1071,11 +1630,11 @@ function MarketIntelligence() {
             <div className="decision-status">
 
               <span>
-                PHASE 2
+                FORECAST METHOD
               </span>
 
               <strong>
-                ML MODEL
+                VALIDATED BASELINE
               </strong>
 
             </div>

@@ -1,0 +1,77 @@
+source_id,district,mandal,reservoir,river,present_level_m,present_level_ft,present_capacity_mcum,present_capacity_tmc,frl_m,frl_ft,gross_capacity_mcum,gross_capacity_tmc,storage_percentage,updated_at,source,fetched_at
+12067,Alluri Sitharama Raju,Rampachodavaram,Bhupatipalem Reservoir,Seetapallivagu,203.26,666.86,16.86,0.6,204.0,669.29,18.3,0.65,92.3,13/03/26 12:00,AP_DES,2026-08-26T21:16:13.073614
+12107,Annamayya,T Sundupalle,Pincha Project,Pincha,300.22,984.97,6.59,0.23,304.8,1000.0,9.28,0.33,69.7,13/03/26 12:00,AP_DES,2026-08-26T21:16:13.073879
+12052,Parvathipuram Manyam,Pachipenta,Peddagedda Reservoir,Peddagedda,210.83,691.7,18.11,0.64,213.8,701.44,30.3,1.07,59.8,13/03/26 12:00,AP_DES,2026-08-26T21:16:13.074096
+12055,Prakasam,Chimakurthy,Rama Thirtham,NSP canal,81.19,266.37,26.38,0.93,85.34,279.99,44.43,1.57,59.2,13/03/26 12:00,AP_DES,2026-08-26T21:16:13.074256
+12074,Alluri Sitharama Raju,Paderu,Pedderu Reservoir,Pedderu,133.91,439.34,6.57,0.23,137.0,449.48,13.4,0.47,48.9,13/03/26 12:00,AP_DES,2026-08-26T21:16:13.074408
+12063,Sri Potti Sriramulu Nellore,Lingasamudram,Rallapadu Reservoir,Manneru,38.61,126.67,13.63,0.48,41.15,135.01,31.33,1.11,43.2,13/03/26 12:00,AP_DES,2026-08-26T21:16:13.074767
+12102,Annamayya,Thamballapalle,Pedderu Reservoir Project,Pedderu,473.94,1554.92,6.27,0.22,481.5,1579.72,15.86,0.56,39.3,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.075529
+12109,Y.S.R,B.Kodur,Lower Sagileru Ani Cut,Sagileru,156.18,512.4,2.8,0.1,156.97,515.0,7.31,0.26,38.5,13/03/26 12:00,AP_DES,2026-08-26T21:16:13.075944
+12835,Nandyal,Srisailam,Srisailam,Krishna,257.87,846.03,2034.77,71.85,270.0,885.83,6111.06,215.79,33.3,13/03/26 12:00,AP_DES,2026-08-26T21:16:13.076682
+12060,Srikakulam,Jalumuru,Gotta barrage,Vamasadara,36.3,119.09,5.07,0.18,38.1,125.0,18.75,0.66,27.3,13/03/26 12:00,AP_DES,2026-08-26T21:16:13.077341
+12066,Kona Seema,Ramachandrapuram,Surempalem Reservoir,Buradakalva,100.44,329.53,1.79,0.06,105.0,344.49,7.93,0.28,21.4,13/03/26 12:00,AP_DES,2026-08-26T21:16:13.077660
+12092,Ananthapuramu,Garladinne,Mid Pennar Reservoir,Pennar,352.74,1157.28,22.4,0.79,365.76,1200.0,147.25,5.2,15.2,13/03/26 12:00,AP_DES,2026-08-26T21:16:13.077894
+12843,Sri Potti Sriramulu Nellore,Ananthasagaram,Somasila,Pennar,,,,0.0,100.58,329.99,2092.61,73.89,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.078154
+12119,Eluru,Chintalapudi,Gonelavagu,Gonelavagu,,,,0.0,108.2,355.0,50.15,1.77,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.078425
+12118,Eluru,Pedavegi,Vijayarai Anicut,Tammileru,,,,0.0,31.2,102.36,,0.0,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.078682
+12117,Eluru,Chintalapudi,Tammileru Reservoir,Tammileru,,,,0.0,108.2,355.0,31.29,1.1,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.078925
+12116,Ananthapuramu,Beluguppa,Jeedipalli Reservoir,,,,,0.0,464.2,1522.97,,0.0,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.079216
+12115,Eluru,T.Narasapuram,Yerrakalva Reservoir,Yerrakalva,,,,0.0,83.5,273.95,70.36,2.48,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.079470
+12114,Eluru,Buttayagudem,Jalleru Reservoir,Jaller,,,,0.0,217.8,714.57,15.15,0.53,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.079755
+12113,Eluru,Polavaram,Kovvadakalva Reservoir,Kovvadakalva,,,,0.0,90.5,296.92,12.35,0.44,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.079994
+12112,Y.S.R,Lingala,Chitravati Balancing Reservoir,Chitravati,,,,0.0,298.0,977.69,283.17,10.0,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.080241
+12111,Y.S.R,Kondapuram,Gandikota Reservoir,Pennar,,,,0.0,212.0,695.54,760.31,26.85,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.080487
+12110,Y.S.R,Badvel,Brahmamsagar Reservoir,TGP,,,,0.0,216.5,710.3,502.2,17.73,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.080690
+12108,Annamayya,Rajampet,Annamayya (Cheyyeru) Reservoir,Cheyyeru,,,,0.0,203.6,667.98,63.16,2.23,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.080859
+12106,Annamayya,Galiveedu,Veligallu Reservoir,Papagni,,,,0.0,420.0,1377.95,129.12,4.56,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.081029
+12105,Y.S.R,Chinthakommadinne,Buggavanka Reservoir,Buggavanka,,,,0.0,186.0,610.24,14.33,0.51,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.081195
+12104,Kurnool,Gonegandla,Gajuladinne Project,Handri,,,,0.0,377.0,1236.88,127.43,4.5,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.081359
+12103,Anakapalli,Madugula,NTR Reservoir,Tacheru,,,,0.0,112.0,367.45,5.77,0.2,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.081522
+12101,Kakinada,Prathipadu,Subbareddy Sagar,Kuntidevi Vagu,,,,0.0,87.0,285.43,6.63,0.23,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.081683
+12100,Tirupati,Chandragiri,Kalyani Dam,Kalyani,,,,0.0,274.32,900.0,25.79,0.91,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.081867
+12099,Chittoor,Vedurukuppam,Krishnapuram Project,Kushastali,,,,0.0,213.0,698.82,5.65,0.2,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.082037
+12098,Tirupati,Pichatur,Araniar Reservoir,Araniar,,,,0.0,85.65,281.0,52.47,1.85,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.082206
+12097,Tirupati,Nagalapuram,Kalangi Reservoir,Kalangi,,,,0.0,67.67,222.0,6.82,0.24,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.082366
+12096,Sri Sathya Sai,Tanakal,Chennaraya Swami Gudi Project,Papagni,,,,0.0,587.35,1927.0,4.81,0.17,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.082529
+12095,Sri Sathya Sai,Mudigubba,Yogi Vemana (Maddileru) Reservoir,Maddileru,,,,0.0,383.0,1256.56,25.49,0.9,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.082692
+12094,Ananthapuramu,Gummagatta,Bhairavanithippa Project,Vedavati,,,,0.0,504.44,1655.0,56.66,2.0,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.082859
+12093,Ananthapuramu,Kudair,Penna Ahobilam Balancing Reservoir,Pennar,,,,0.0,443.0,1453.41,314.32,11.1,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.083021
+12091,Ananthapuramu,Peddapappur,Chagallu balancing reservoir,Pennar,,,,0.0,265.93,872.47,50.94,1.8,,13/03/26 12:06,AP_DES,2026-08-26T21:16:13.083181
+12090,Nandyal,Owk,Owk Reservoir,SRBC,,,,0.0,227.0,744.75,117.46,4.15,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.083341
+12089,Nandyal,Bethamcherla,Zurreru Reservoir,Zurreru,,,,0.0,263.65,865.0,7.53,0.27,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.083502
+12088,Nandyal,Atmakur,Varadarajaswamy Gudi Project,Munimadugula Vagu,,,,0.0,370.0,1213.91,11.02,0.39,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.083663
+12087,Nandyal,Velugodu,Velogodu Balancing Reservoir,Galeru,,,,0.0,264.7,868.44,479.97,16.95,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.083845
+12086,Nandyal,Midthur,Alaganuru Balancing Reservoir,,,,,0.0,265.0,869.42,83.96,2.96,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.084015
+12085,Kurnool,Gudur,Sunkesula Barrage,Tungabhadra,,,,0.0,292.0,958.01,34.99,1.24,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.084182
+12084,Kakinada,Kotananduru,Pampa Reservoir,Pampa,,,,0.0,32.0,105.0,14.1,0.5,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.084342
+12083,Parvathipuram Manyam,Palakonda,Madduvalasa Project,Suvarnamukhi,,,,0.0,65.0,213.25,95.48,3.37,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.084502
+12082,Srikakulam,Burja,Narayanapuram Anicut,Nagavali,,,,0.0,,,,0.0,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.084676
+12081,Sri Potti Sriramulu Nellore,Muthukur,Sarvepalli Reservoir,,,,,0.0,8.45,27.72,12.35,0.44,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.084843
+12080,Tirupati,Vakadu,Swarnamukhi Barrage Cum Bridge,Swarnamukhi,,,,0.0,9.0,29.53,1.0,0.04,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.085006
+12079,Visakhapatnam,Pendurthi,Mehadrigadd Reservoir,Naravagedda,,,,0.0,18.59,61.0,33.1,1.17,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.085165
+12078,Anakapalli,Nakkapalli,Raiwada Reservoir,Sarada,,,,0.0,114.0,374.02,101.94,3.6,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.085324
+12077,Sri Potti Sriramulu Nellore,Podalakur,Kandaleru Reservoir,TGP,,,,0.0,85.0,278.87,1926.4,68.02,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.085493
+12076,Anakapalli,Devarapalli,Konam Reservoir,Bodderu,,,,0.0,101.25,332.19,48.14,1.7,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.085655
+12075,Sri Potti Sriramulu Nellore,Buchireddipalem,Kanigiri Reservoir,,,,,0.0,30.07,98.67,100.64,3.55,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.085831
+12073,Sri Potti Sriramulu Nellore,Sangam,Sangam Anicut / Barrge,Pennar,,,,0.0,34.2,112.22,,0.0,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.086008
+12072,Anakapalli,Ravikamatham,Varaha Reservoir,Sarpa,,,,0.0,140.21,460.0,13.17,0.46,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.086168
+12071,Anakapalli,Golugonda,Tandava Reservoir,Thandava,,,,0.0,115.82,380.0,140.45,4.96,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.086335
+12070,Sri Potti Sriramulu Nellore,Seetharamapuram,Gandipalem Reservoir Project,Pillaperu,,,,0.0,147.83,485.0,53.24,1.88,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.086499
+12069,East Godavari,Rajamahendravaram Urban,Sir Aurthur Cotton Barrage,Godavari,13.41,44.0,,0.0,13.64,44.75,,0.0,,13/03/26 12:00,AP_DES,2026-08-26T21:16:13.086658
+12068,Prakasam,Maddipadu,Gundlakamma Reservoir,Gundlakamma,,,,0.0,24.38,79.99,109.27,3.86,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.086819
+12065,Y.S.R,Vallur,Adinimmayapalli Anicut,Pennar,,,,0.0,5.49,18.0,,0.0,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.086983
+12064,Kakinada,Yeleswaram,Yeleru Reservoir,Yeleru,,,,0.0,86.56,283.99,682.72,24.11,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.087152
+12062,Srikakulam,Burja,Gajjiligedda Reservoir,Gajjiligedda,,,,0.0,108.5,355.97,,0.0,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.087318
+12061,Prakasam,Pamur,Mopadu Reservoir Project,Manneru,,,,0.0,100.15,328.58,59.22,2.09,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.087479
+12059,Srikakulam,Kanchili,Kalingadal Project,Kalingadal,,,,0.0,82.0,269.03,,0.0,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.087643
+12058,Prakasam,Ardhaveedu,Cum Bum Tank,Gundlakamma & Jampaleru,,,0.0,0.0,203.2,666.67,83.59,2.95,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.087822
+12057,Srikakulam,Nandigam,Damodaram Sagaram,Raikiloyagedda,,,,0.0,51.0,167.32,,0.0,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.087989
+12056,Parvathipuram Manyam,Jiyyammavalasa,Thotapalli Regulator / Barrage,Nagavali,,,,0.0,105.0,344.49,70.79,2.5,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.088151
+12054,Parvathipuram Manyam,Kurupam,Vattigedda Reservoir,Vattigedda,,,,0.0,121.62,399.0,27.12,0.96,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.088310
+12053,Parvathipuram Manyam,Makkuva,Vengalraya Sagaram,Suvarnamukhi & Gomukhi,,,,0.0,161.0,528.22,47.57,1.68,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.088477
+12051,Vizianagaram,Ramabhadrapuram,Andra Reservoir,Champavati,,,,0.0,146.0,479.0,27.75,0.98,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.088638
+12050,Vizianagaram,Gurla,Thatipudi Reservoir,Gostani,,,0.0,0.0,90.52,296.98,94.3,3.33,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.088799
+12049,Palnadu,Bellamkonda,Pulichinthala Project,Krishna,,,,0.0,53.34,175.0,1296.06,45.76,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.088959
+12048,NTR,Vatsavai,Muniyeru Project,Muniyeru,,,,0.0,71.0,232.94,29.88,1.06,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.089122
+12047,NTR,Vijayawada Central,Prakasam Barrage,Krishna,,,,0.0,17.39,57.05,87.0,3.07,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.089282
+12041,Y.S.R,Mylavaram,Pennar,Pennar,,,,0.0,201.65,661.58,283.0,9.99,,13/03/26 13:00,AP_DES,2026-08-26T21:16:13.089441
