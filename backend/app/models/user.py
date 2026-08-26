@@ -37,6 +37,21 @@ class User(Base):
         default="farmer",
     )
 
+    mobile_verified: Mapped[bool] = mapped_column(
+        default=False,
+        nullable=False,
+    )
+
+    email_verified: Mapped[bool] = mapped_column(
+        default=False,
+        nullable=False,
+    )
+
+    consent_given_at: Mapped[datetime | None] = mapped_column(
+        DateTime,
+        nullable=True,
+    )
+
     created_at: Mapped[datetime] = mapped_column(
         DateTime,
         default=datetime.utcnow,

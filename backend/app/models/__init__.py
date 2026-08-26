@@ -6,6 +6,7 @@ from app.models.market_price import MarketPrice
 from app.models.reservoir import WaterReservoir
 from app.models.crop_profile import CropProfile
 from app.models.crop_growth_stage import CropGrowthStage
+from app.models.verification_otp import VerificationOTP
 
 __all__ = [
     "User",
@@ -16,6 +17,5 @@ __all__ = [
     "WaterReservoir",
     "CropProfile",
     "CropGrowthStage",
+    "VerificationOTP",
 ]
-
-

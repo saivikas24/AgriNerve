@@ -1,4 +1,4 @@
-from logging.config import fileConfig
+﻿from logging.config import fileConfig
 
 from sqlalchemy import create_engine, pool
 
@@ -6,7 +6,12 @@ from alembic import context
 
 from app.core.config import settings
 from app.core.database import Base
-from app.models import User, FarmerProfile, Farm
+from app.models import (
+    User,
+    FarmerProfile,
+    Farm,
+    VerificationOTP,
+)
 
 
 config = context.config

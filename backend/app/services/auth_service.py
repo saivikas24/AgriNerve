@@ -1,3 +1,5 @@
+﻿from datetime import datetime
+
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -11,7 +13,6 @@ def get_user_by_email(
     db: Session,
     email: str,
 ) -> User | None:
-    """Find a user by email address."""
     statement = select(User).where(User.email == email)
     return db.scalar(statement)
 
@@ -20,13 +21,15 @@ def create_user(
     db: Session,
     user_data: UserRegister,
 ) -> User:
-    """Create a new user and farmer profile."""
+    """Create a user and farmer profile."""
+
     hashed_password = hash_password(user_data.password)
 
     user = User(
         email=user_data.email,
         hashed_password=hashed_password,
         role="farmer",
+        consent_given_at=datetime.utcnow() if user_data.consent else None,
     )
 
     db.add(user)
@@ -53,7 +56,6 @@ def authenticate_user(
     email: str,
     password: str,
 ) -> User | None:
-    """Verify user credentials."""
     user = get_user_by_email(db, email)
 
     if user is None:
@@ -63,3 +65,13 @@ def authenticate_user(
         return None
 
     return user
+
+
+def update_password(
+    db: Session,
+    user: User,
+    new_password: str,
+) -> None:
+    user.hashed_password = hash_password(new_password)
+    db.commit()
+    db.refresh(user)

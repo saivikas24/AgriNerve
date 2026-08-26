@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict, EmailStr
+﻿from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 
 class UserRegister(BaseModel):
@@ -9,6 +9,7 @@ class UserRegister(BaseModel):
     village: str | None = None
     district: str | None = None
     state: str = "Andhra Pradesh"
+    consent: bool = False
 
 
 class UserLogin(BaseModel):
@@ -27,3 +28,13 @@ class UserResponse(BaseModel):
     id: int
     email: EmailStr
     role: str
+
+
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+
+class ResetPasswordRequest(BaseModel):
+    email: EmailStr
+    otp: str = Field(pattern=r"^\d{6}$")
+    new_password: str = Field(min_length=8, max_length=128)
