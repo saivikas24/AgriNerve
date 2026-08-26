@@ -6,6 +6,8 @@ from app.api.v1.disease import router as disease_router
 from app.api.v1.farms import router as farms_router
 from app.api.v1.market import router as market_router
 from app.api.v1.water import router as water_router
+from app.api.v1.crop_intelligence import router as crop_intelligence_router
+from app.api.v1.weather import router as weather_router
 
 
 api_router = APIRouter()
@@ -16,3 +18,6 @@ api_router.include_router(crops_router)
 api_router.include_router(disease_router)
 api_router.include_router(market_router)
 api_router.include_router(water_router)
+api_router.include_router(crop_intelligence_router)
+api_router.include_router(weather_router)
+

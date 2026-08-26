@@ -4,6 +4,7 @@ import FarmProfileCard from "../../components/agriculture/FarmProfileCard";
 import CropHealthCard from "../../components/agriculture/CropHealthCard";
 import MarketCard from "../../components/agriculture/MarketCard";
 import WaterStatusCard from "../../components/agriculture/WaterStatusCard";
+import WeatherStatusCard from "../../components/agriculture/WeatherStatusCard";
 import RecommendationCard from "../../components/agriculture/RecommendationCard";
 
 import "./FarmerDashboard.css";
@@ -397,7 +398,7 @@ function FarmerDashboard() {
 
 
           <h1>
-            Good morning, Farmer 👋
+            Good morning, Farmer ??
           </h1>
 
 
@@ -686,7 +687,7 @@ function FarmerDashboard() {
 
         <MarketCard
           cropName="Paddy"
-          currentPrice="₹7,250 / q"
+          currentPrice="?7,250 / q"
           priceChange="+4.2%"
           trend="Rising"
           marketName="Local Market"
@@ -735,6 +736,11 @@ function FarmerDashboard() {
 
       </section>
 
+
+      <WeatherStatusCard
+        district={selectedDistrict}
+        mandal={selectedMandal}
+      />
 
       {selectedReservoir &&
         !waterError && (
@@ -982,3 +988,8 @@ function FarmerDashboard() {
 
 
 export default FarmerDashboard;
+
+
+
+
+
