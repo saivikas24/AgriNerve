@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import FarmProfileCard from "../../components/agriculture/FarmProfileCard";
 import CropHealthCard from "../../components/agriculture/CropHealthCard";
@@ -7,12 +7,9 @@ import WaterStatusCard from "../../components/agriculture/WaterStatusCard";
 import WeatherStatusCard from "../../components/agriculture/WeatherStatusCard";
 import RecommendationCard from "../../components/agriculture/RecommendationCard";
 
-import { getFarms } from "../../api/farms";
-import { getCrops } from "../../api/crops";
-import type { FarmResponse } from "../../api/farms";
-import type { CropResponse } from "../../api/crops";
 
 import "./FarmerDashboard.css";
+import { useFarmData } from "./dashboard/hooks/useFarmData";
 
 
 interface Reservoir {
@@ -99,21 +96,12 @@ function getIrrigationNeed(
 
 function FarmerDashboard() {
 
-  /*
-   * REAL FARM DATA
-   */
-  const [farm, setFarm] =
-    useState<FarmResponse | null>(null);
-
-  const [farmLoading, setFarmLoading] =
-    useState(true);
-
-  const [farmError, setFarmError] =
-    useState("");
-
-  const [crops, setCrops] =
-    useState<CropResponse[]>([]);
-
+  const {
+    farm,
+    farmLoading,
+    farmError,
+    crops,
+  } = useFarmData();
 
   /*
    * WATER DATA
@@ -150,73 +138,6 @@ function FarmerDashboard() {
 
   const [waterError, setWaterError] =
     useState(false);
-
-
-  /*
-   * Load the logged-in farmer's farm.
-   */
-  useEffect(() => {
-
-    const loadFarm = async () => {
-
-      try {
-
-        setFarmLoading(true);
-        setFarmError("");
-
-        const farms = await getFarms();
-
-        const activeFarmId = localStorage.getItem(
-          "agrinerve_active_farm_id",
-        );
-
-        const activeFarm = activeFarmId
-          ? farms.find(
-              (item) =>
-                item.id === Number(activeFarmId),
-            )
-          : farms[0];
-
-        if (!activeFarm) {
-          window.location.href = "/farmer/setup";
-          return;
-        }
-
-        setFarm(activeFarm);
-
-        try {
-          const farmCrops = await getCrops(activeFarm.id);
-          setCrops(farmCrops);
-        } catch (cropError) {
-          console.error("Crop loading error:", cropError);
-          setCrops([]);
-        }
-
-      } catch (error) {
-
-        console.error(
-          "Farm loading error:",
-          error,
-        );
-
-        setFarmError(
-          error instanceof Error
-            ? error.message
-            : "Unable to load your farm.",
-        );
-
-      } finally {
-
-        setFarmLoading(false);
-
-      }
-
-    };
-
-
-    loadFarm();
-
-  }, []);
 
 
   /*
