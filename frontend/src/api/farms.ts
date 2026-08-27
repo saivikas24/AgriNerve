@@ -8,6 +8,7 @@ export interface FarmCreateData {
   area_acres: number;
   soil_type?: string;
   irrigation_type?: string;
+  preferred_market?: string;
 }
 
 export interface FarmResponse {
@@ -20,6 +21,7 @@ export interface FarmResponse {
   area_acres: number;
   soil_type: string | null;
   irrigation_type: string | null;
+  preferred_market: string | null;
   created_at: string;
 }
 

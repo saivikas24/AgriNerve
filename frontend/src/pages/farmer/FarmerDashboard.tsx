@@ -135,95 +135,59 @@ function FarmerDashboard() {
   /*
    * Load market intelligence for the active crop.
    */
-   useEffect(() => {
-
+useEffect(() => {
   const loadMarketForecast = async () => {
-
     if (!activeCrop?.variety) {
       setMarketForecast(null);
       return;
     }
 
+    if (!farm?.preferred_market) {
+      setMarketForecast(null);
+      return;
+    }
+
     const cropVariety = activeCrop.variety;
+    const preferredMarket = farm.preferred_market;
 
     try {
-
       setMarketLoading(true);
 
-      const marketsResponse = await fetch(
-        "http://127.0.0.1:8000/api/v1/market/markets",
+      const params = new URLSearchParams();
+
+      params.set("market", preferredMarket);
+      params.set("variety", cropVariety);
+
+      const forecastResponse = await fetch(
+        `http://127.0.0.1:8000/api/v1/market/forecast?${params.toString()}`,
       );
 
-      if (!marketsResponse.ok) {
-        throw new Error("Failed to load markets");
-      }
-
-      const markets: string[] =
-        await marketsResponse.json();
-
-      if (markets.length === 0) {
+      if (!forecastResponse.ok) {
         setMarketForecast(null);
         return;
       }
 
-      for (const market of markets) {
+      const forecast: MarketForecast =
+        await forecastResponse.json();
 
-        const varietiesResponse = await fetch(
-          `http://127.0.0.1:8000/api/v1/market/varieties?market=${encodeURIComponent(market)}`,
-        );
-
-        if (!varietiesResponse.ok) {
-          continue;
-        }
-
-        const varieties: string[] =
-          await varietiesResponse.json();
-
-        if (!varieties.includes(cropVariety)) {
-          continue;
-        }
-
-        const params = new URLSearchParams();
-
-        params.set("market", market);
-        params.set("variety", cropVariety);
-
-        const forecastResponse = await fetch(
-          `http://127.0.0.1:8000/api/v1/market/forecast?${params.toString()}`,
-        );
-
-        if (!forecastResponse.ok) {
-          continue;
-        }
-
-        const forecast: MarketForecast =
-          await forecastResponse.json();
-
-        setMarketForecast(forecast);
-        return;
-      }
-
-      setMarketForecast(null);
-
+      setMarketForecast(forecast);
     } catch (error) {
-
       console.error(
         "Dashboard market loading error:",
         error,
       );
 
       setMarketForecast(null);
-
     } finally {
-
       setMarketLoading(false);
-
     }
   };
 
   loadMarketForecast();
-
-}, [activeCrop?.variety]);
+}, [
+  activeCrop?.variety,
+  farm?.preferred_market,
+]);
   /*
    * WATER DATA
    */
