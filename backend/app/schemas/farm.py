@@ -21,6 +21,7 @@ class FarmUpdate(BaseModel):
     area_acres: float | None = None
     soil_type: str | None = None
     irrigation_type: str | None = None
+    preferred_market: str | None = None
 
 
 class FarmResponse(BaseModel):
@@ -35,4 +36,5 @@ class FarmResponse(BaseModel):
     area_acres: float
     soil_type: str | None
     irrigation_type: str | None
+    preferred_market: str | None
     created_at: datetime
