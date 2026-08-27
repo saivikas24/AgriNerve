@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import FarmProfileCard from "../../components/agriculture/FarmProfileCard";
 import CropHealthCard from "../../components/agriculture/CropHealthCard";
@@ -135,95 +135,76 @@ function FarmerDashboard() {
   /*
    * Load market intelligence for the active crop.
    */
-   useEffect(() => {
-
-  const loadMarketForecast = async () => {
+  useEffect(() => {
 
     if (!activeCrop?.variety) {
       setMarketForecast(null);
       return;
     }
 
-    const cropVariety = activeCrop.variety;
+    const loadMarketForecast = async () => {
 
-    try {
+      try {
 
-      setMarketLoading(true);
+        setMarketLoading(true);
 
-      const marketsResponse = await fetch(
-        "http://127.0.0.1:8000/api/v1/market/markets",
-      );
-
-      if (!marketsResponse.ok) {
-        throw new Error("Failed to load markets");
-      }
-
-      const markets: string[] =
-        await marketsResponse.json();
-
-      if (markets.length === 0) {
-        setMarketForecast(null);
-        return;
-      }
-
-      for (const market of markets) {
-
-        const varietiesResponse = await fetch(
-          `http://127.0.0.1:8000/api/v1/market/varieties?market=${encodeURIComponent(market)}`,
+        const marketsResponse = await fetch(
+          "http://127.0.0.1:8000/api/v1/market/markets",
         );
 
-        if (!varietiesResponse.ok) {
-          continue;
+        if (!marketsResponse.ok) {
+          throw new Error("Failed to load markets");
         }
 
-        const varieties: string[] =
-          await varietiesResponse.json();
+        const markets: string[] =
+          await marketsResponse.json();
 
-        if (!varieties.includes(cropVariety)) {
-          continue;
+        if (markets.length === 0) {
+          setMarketForecast(null);
+          return;
         }
 
         const params = new URLSearchParams();
 
-        params.set("market", market);
-        params.set("variety", cropVariety);
+        params.set("market", markets[0]);
+        params.set(
+          "variety",
+          activeCrop.variety ?? "",
+        );
 
         const forecastResponse = await fetch(
           `http://127.0.0.1:8000/api/v1/market/forecast?${params.toString()}`,
         );
 
         if (!forecastResponse.ok) {
-          continue;
+          setMarketForecast(null);
+          return;
         }
 
         const forecast: MarketForecast =
           await forecastResponse.json();
 
         setMarketForecast(forecast);
-        return;
+
+      } catch (error) {
+
+        console.error(
+          "Dashboard market loading error:",
+          error,
+        );
+
+        setMarketForecast(null);
+
+      } finally {
+
+        setMarketLoading(false);
+
       }
+    };
 
-      setMarketForecast(null);
+    loadMarketForecast();
 
-    } catch (error) {
-
-      console.error(
-        "Dashboard market loading error:",
-        error,
-      );
-
-      setMarketForecast(null);
-
-    } finally {
-
-      setMarketLoading(false);
-
-    }
-  };
-
-  loadMarketForecast();
-
-}, [activeCrop?.variety]);
+  }, [activeCrop?.variety]);
   /*
    * WATER DATA
    */
