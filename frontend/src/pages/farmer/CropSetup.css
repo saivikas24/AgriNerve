@@ -1,0 +1,143 @@
+﻿.crop-setup-page {
+  min-height: 100%;
+  padding: 40px;
+}
+
+.crop-setup-card {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 36px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+}
+
+.crop-setup-header {
+  margin-bottom: 28px;
+}
+
+.crop-setup-eyebrow {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  color: #397a32;
+}
+
+.crop-setup-header h1 {
+  margin: 8px 0;
+  font-size: 30px;
+}
+
+.crop-setup-header p {
+  margin: 0;
+  color: #667085;
+  line-height: 1.6;
+}
+
+.crop-setup-error {
+  margin-bottom: 20px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: #fff1f1;
+  color: #b42318;
+  font-size: 14px;
+}
+
+.crop-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.crop-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.crop-form-group label {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.crop-form-group input,
+.crop-form-group select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  background: white;
+  font-size: 14px;
+}
+
+.crop-form-group input:focus,
+.crop-form-group select:focus {
+  outline: none;
+  border-color: #397a32;
+}
+
+.crop-setup-info {
+  margin-top: 26px;
+  padding: 16px;
+  border-radius: 10px;
+  background: #f4f8f2;
+}
+
+.crop-setup-info strong {
+  font-size: 14px;
+}
+
+.crop-setup-info p {
+  margin: 6px 0 0;
+  color: #667085;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.crop-setup-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.crop-cancel-button,
+.crop-save-button {
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.crop-cancel-button {
+  border: 1px solid #d0d5dd;
+  background: white;
+}
+
+.crop-save-button {
+  border: none;
+  background: #397a32;
+  color: white;
+}
+
+.crop-cancel-button:disabled,
+.crop-save-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 700px) {
+  .crop-setup-page {
+    padding: 20px;
+  }
+
+  .crop-setup-card {
+    padding: 24px;
+  }
+
+  .crop-form-grid {
+    grid-template-columns: 1fr;
+  }
+}

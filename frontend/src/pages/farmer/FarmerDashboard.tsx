@@ -7,6 +7,11 @@ import WaterStatusCard from "../../components/agriculture/WaterStatusCard";
 import WeatherStatusCard from "../../components/agriculture/WeatherStatusCard";
 import RecommendationCard from "../../components/agriculture/RecommendationCard";
 
+import { getFarms } from "../../api/farms";
+import { getCrops } from "../../api/crops";
+import type { FarmResponse } from "../../api/farms";
+import type { CropResponse } from "../../api/crops";
+
 import "./FarmerDashboard.css";
 
 
@@ -49,7 +54,6 @@ type WaterStatus =
 function getWaterStatus(
   storage: number | null,
 ): WaterStatus {
-
   if (storage === null) {
     return "Critical";
   }
@@ -73,7 +77,6 @@ function getWaterStatus(
 function getIrrigationNeed(
   storage: number | null,
 ): string {
-
   if (storage === null) {
     return "Unknown";
   }
@@ -96,6 +99,25 @@ function getIrrigationNeed(
 
 function FarmerDashboard() {
 
+  /*
+   * REAL FARM DATA
+   */
+  const [farm, setFarm] =
+    useState<FarmResponse | null>(null);
+
+  const [farmLoading, setFarmLoading] =
+    useState(true);
+
+  const [farmError, setFarmError] =
+    useState("");
+
+  const [crops, setCrops] =
+    useState<CropResponse[]>([]);
+
+
+  /*
+   * WATER DATA
+   */
   const [districts, setDistricts] =
     useState<string[]>([]);
 
@@ -131,6 +153,73 @@ function FarmerDashboard() {
 
 
   /*
+   * Load the logged-in farmer's farm.
+   */
+  useEffect(() => {
+
+    const loadFarm = async () => {
+
+      try {
+
+        setFarmLoading(true);
+        setFarmError("");
+
+        const farms = await getFarms();
+
+        const activeFarmId = localStorage.getItem(
+          "agrinerve_active_farm_id",
+        );
+
+        const activeFarm = activeFarmId
+          ? farms.find(
+              (item) =>
+                item.id === Number(activeFarmId),
+            )
+          : farms[0];
+
+        if (!activeFarm) {
+          window.location.href = "/farmer/setup";
+          return;
+        }
+
+        setFarm(activeFarm);
+
+        try {
+          const farmCrops = await getCrops(activeFarm.id);
+          setCrops(farmCrops);
+        } catch (cropError) {
+          console.error("Crop loading error:", cropError);
+          setCrops([]);
+        }
+
+      } catch (error) {
+
+        console.error(
+          "Farm loading error:",
+          error,
+        );
+
+        setFarmError(
+          error instanceof Error
+            ? error.message
+            : "Unable to load your farm.",
+        );
+
+      } finally {
+
+        setFarmLoading(false);
+
+      }
+
+    };
+
+
+    loadFarm();
+
+  }, []);
+
+
+  /*
    * Load districts once.
    */
   useEffect(() => {
@@ -142,12 +231,12 @@ function FarmerDashboard() {
         setLoadingDistricts(true);
 
         const response = await fetch(
-          "http://127.0.0.1:8000/api/v1/water/districts"
+          "http://127.0.0.1:8000/api/v1/water/districts",
         );
 
         if (!response.ok) {
           throw new Error(
-            "Failed to load districts"
+            "Failed to load districts",
           );
         }
 
@@ -160,7 +249,7 @@ function FarmerDashboard() {
 
         console.error(
           "District loading error:",
-          error
+          error,
         );
 
       } finally {
@@ -168,6 +257,7 @@ function FarmerDashboard() {
         setLoadingDistricts(false);
 
       }
+
     };
 
 
@@ -177,8 +267,7 @@ function FarmerDashboard() {
 
 
   /*
-   * Load mandals only after the user
-   * explicitly selects a district.
+   * Load mandals after district selection.
    */
   useEffect(() => {
 
@@ -210,14 +299,14 @@ function FarmerDashboard() {
 
         const response = await fetch(
           `http://127.0.0.1:8000/api/v1/water/mandals?district=${encodeURIComponent(
-            selectedDistrict
-          )}`
+            selectedDistrict,
+          )}`,
         );
 
 
         if (!response.ok) {
           throw new Error(
-            "Failed to load mandals"
+            "Failed to load mandals",
           );
         }
 
@@ -232,7 +321,7 @@ function FarmerDashboard() {
 
         console.error(
           "Mandal loading error:",
-          error
+          error,
         );
 
         setMandals([]);
@@ -252,8 +341,7 @@ function FarmerDashboard() {
 
 
   /*
-   * Load reservoirs only after the user
-   * explicitly selects a mandal.
+   * Load reservoirs after mandal selection.
    */
   useEffect(() => {
 
@@ -284,9 +372,9 @@ function FarmerDashboard() {
 
         const url =
           `http://127.0.0.1:8000/api/v1/water/reservoirs?district=${encodeURIComponent(
-            selectedDistrict
+            selectedDistrict,
           )}&mandal=${encodeURIComponent(
-            selectedMandal
+            selectedMandal,
           )}&limit=20`;
 
 
@@ -296,7 +384,7 @@ function FarmerDashboard() {
 
         if (!response.ok) {
           throw new Error(
-            "Failed to load reservoirs"
+            "Failed to load reservoirs",
           );
         }
 
@@ -311,7 +399,7 @@ function FarmerDashboard() {
 
         console.error(
           "Reservoir loading error:",
-          error
+          error,
         );
 
         setReservoirs([]);
@@ -335,8 +423,7 @@ function FarmerDashboard() {
 
 
   /*
-   * Set the actual reservoir only after
-   * the user explicitly selects it.
+   * Set selected reservoir.
    */
   useEffect(() => {
 
@@ -352,17 +439,41 @@ function FarmerDashboard() {
       reservoirs.find(
         (item) =>
           String(item.id) ===
-          selectedReservoirId
+          selectedReservoirId,
       );
 
 
     setSelectedReservoir(
-      reservoir ?? null
+      reservoir ?? null,
     );
 
   }, [
     selectedReservoirId,
     reservoirs,
+  ]);
+
+
+  /*
+   * Automatically use the farm's district
+   * for the water module when available.
+   *
+   * We only set the district if it exists
+   * in the water API's district list.
+   */
+  useEffect(() => {
+
+    if (
+      farm?.district &&
+      districts.includes(farm.district)
+    ) {
+
+      setSelectedDistrict(farm.district);
+
+    }
+
+  }, [
+    farm,
+    districts,
   ]);
 
 
@@ -383,6 +494,83 @@ function FarmerDashboard() {
       ? `${storage.toFixed(1)}%`
       : "Unavailable";
 
+
+  /*
+   * Farm loading state.
+   */
+  if (farmLoading) {
+
+
+  return (
+      <div className="farmer-dashboard">
+
+        <section className="dashboard-heading">
+
+          <div>
+
+            <span className="dashboard-eyebrow">
+              FARM OVERVIEW
+            </span>
+
+            <h1>
+              Loading your farm...
+            </h1>
+
+            <p>
+              AgriNerve is loading your farm information.
+            </p>
+
+          </div>
+
+        </section>
+
+      </div>
+    );
+
+  }
+
+
+  /*
+   * Farm error state.
+   */
+  if (farmError) {
+
+
+  return (
+      <div className="farmer-dashboard">
+
+        <section className="dashboard-heading">
+
+          <div>
+
+            <span className="dashboard-eyebrow">
+              FARM OVERVIEW
+            </span>
+
+            <h1>
+              Unable to load farm
+            </h1>
+
+            <p>
+              {farmError}
+            </p>
+
+          </div>
+
+        </section>
+
+      </div>
+    );
+
+  }
+
+
+  if (!farm) {
+    return null;
+  }
+
+
+  const activeCrop = crops.length > 0 ? crops[0] : null;
 
   return (
 
@@ -411,27 +599,29 @@ function FarmerDashboard() {
 
 
         <span className="demo-badge">
-          DEMO FARM
+          ACTIVE FARM
         </span>
 
       </section>
 
 
+      {/* REAL FARM PROFILE */}
+
       <FarmProfileCard
-        farmerName="Demo Farmer"
+        farmerName={farm.farm_name}
         district={
-          selectedDistrict
-            ? `${selectedDistrict} District`
-            : "Select location"
+          farm.district
+            ? `${farm.district} District`
+            : "District not provided"
         }
-        state="Andhra Pradesh"
-        crop="Paddy"
-        farmArea="2.4 acres"
-        season="Kharif"
+        state={farm.state}
+        crop={activeCrop?.crop_name ?? "No crop added"}
+        farmArea={`${farm.area_acres} acres`}
+        season={activeCrop?.season ?? "Not set"}
       />
 
 
-      {/* WATER LOCATION SELECTION */}
+      {/* WATER LOCATION */}
 
       <section
         className="agri-card"
@@ -500,7 +690,7 @@ function FarmerDashboard() {
               onChange={(event) => {
 
                 setSelectedDistrict(
-                  event.target.value
+                  event.target.value,
                 );
 
               }}
@@ -531,7 +721,7 @@ function FarmerDashboard() {
                     {district}
                   </option>
 
-                )
+                ),
               )}
 
             </select>
@@ -566,7 +756,7 @@ function FarmerDashboard() {
               onChange={(event) => {
 
                 setSelectedMandal(
-                  event.target.value
+                  event.target.value,
                 );
 
               }}
@@ -597,7 +787,7 @@ function FarmerDashboard() {
                     {mandal}
                   </option>
 
-                )
+                ),
               )}
 
             </select>
@@ -632,7 +822,7 @@ function FarmerDashboard() {
               onChange={(event) => {
 
                 setSelectedReservoirId(
-                  event.target.value
+                  event.target.value,
                 );
 
               }}
@@ -663,7 +853,7 @@ function FarmerDashboard() {
                     {reservoir.reservoir}
                   </option>
 
-                )
+                ),
               )}
 
             </select>
@@ -675,22 +865,24 @@ function FarmerDashboard() {
       </section>
 
 
+      {/* DASHBOARD INTELLIGENCE CARDS */}
+
       <section className="dashboard-metrics">
 
         <CropHealthCard
-          cropName="Paddy"
+          cropName={activeCrop?.crop_name ?? "No crop added"}
           healthStatus="Healthy"
           riskLevel="Low"
-          lastChecked="Today"
+          lastChecked={activeCrop ? "Today" : "Waiting for crop"}
         />
 
 
         <MarketCard
-          cropName="Paddy"
-          currentPrice="?7,250 / q"
-          priceChange="+4.2%"
-          trend="Rising"
-          marketName="Local Market"
+          cropName={activeCrop?.crop_name ?? "No crop added"}
+          currentPrice="-"
+          priceChange="-"
+          trend="Stable"
+          marketName="Add crop to view market"
         />
 
 
@@ -742,6 +934,9 @@ function FarmerDashboard() {
         mandal={selectedMandal}
       />
 
+
+      {/* SELECTED RESERVOIR DETAILS */}
+
       {selectedReservoir &&
         !waterError && (
 
@@ -776,11 +971,11 @@ function FarmerDashboard() {
           >
 
             {selectedReservoir.district}
-            {" · "}
+            {" - "}
             {selectedReservoir.mandal}
 
             {selectedReservoir.river
-              ? ` · ${selectedReservoir.river} River`
+              ? ` - ${selectedReservoir.river} River`
               : ""}
 
           </p>
@@ -811,7 +1006,7 @@ function FarmerDashboard() {
 
                 {storage !== null
                   ? `${storage.toFixed(1)}%`
-                  : "—"}
+                  : "-"}
 
               </strong>
 
@@ -834,7 +1029,7 @@ function FarmerDashboard() {
 
                 {selectedReservoir.present_capacity_tmc !== null
                   ? `${selectedReservoir.present_capacity_tmc.toFixed(2)} TMC`
-                  : "—"}
+                  : "-"}
 
               </strong>
 
@@ -857,7 +1052,7 @@ function FarmerDashboard() {
 
                 {selectedReservoir.gross_capacity_tmc !== null
                   ? `${selectedReservoir.gross_capacity_tmc.toFixed(2)} TMC`
-                  : "—"}
+                  : "-"}
 
               </strong>
 
@@ -877,8 +1072,8 @@ function FarmerDashboard() {
             Source: AP DES
 
             {selectedReservoir.updated_at
-              ? ` · Updated ${new Date(
-                  selectedReservoir.updated_at
+              ? ` - Updated ${new Date(
+                  selectedReservoir.updated_at,
                 ).toLocaleString()}`
               : ""}
 
@@ -974,11 +1169,7 @@ function FarmerDashboard() {
             : "Waiting for location selection"
         }
 
-        priority={
-          selectedReservoir
-            ? "Low"
-            : "Low"
-        }
+        priority="Low"
       />
 
     </div>
@@ -988,6 +1179,8 @@ function FarmerDashboard() {
 
 
 export default FarmerDashboard;
+
+
 
 
 

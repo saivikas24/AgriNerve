@@ -28,7 +28,8 @@ class UserResponse(BaseModel):
     id: int
     email: EmailStr
     role: str
-
+    email_verified: bool
+    mobile_verified: bool
 
 class ForgotPasswordRequest(BaseModel):
     email: EmailStr

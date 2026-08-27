@@ -1,10 +1,7 @@
-﻿from datetime import datetime
-
-from fastapi import APIRouter, Depends, HTTPException, status
+﻿from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.api.dependencies import get_current_user
-from app.core.config import settings
 from app.core.database import get_db
 from app.core.security import create_access_token
 from app.models.user import User
@@ -22,6 +19,7 @@ from app.services.auth_service import (
     get_user_by_email,
     update_password,
 )
+from app.services.email_service import send_email_otp
 from app.services.otp_service import create_otp, verify_otp
 
 
@@ -30,6 +28,10 @@ router = APIRouter(
     tags=["Authentication"],
 )
 
+
+# ============================================================
+# REGISTER
+# ============================================================
 
 @router.post(
     "/register",
@@ -59,6 +61,10 @@ def register(
     return user
 
 
+# ============================================================
+# LOGIN
+# ============================================================
+
 @router.post(
     "/login",
     response_model=TokenResponse,
@@ -86,6 +92,10 @@ def login(
     )
 
 
+# ============================================================
+# CURRENT USER
+# ============================================================
+
 @router.get(
     "/me",
     response_model=UserResponse,
@@ -96,10 +106,14 @@ def get_me(
     return current_user
 
 
+# ============================================================
+# SEND EMAIL OTP
+# ============================================================
+
 @router.post(
     "/send-email-otp",
 )
-def send_email_otp(
+def send_email_otp_endpoint(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
@@ -109,21 +123,41 @@ def send_email_otp(
             detail="Email is already verified.",
         )
 
+    # Generate and store hashed OTP
     otp = create_otp(
         db,
         current_user,
         "email_verification",
     )
 
-    response = {
-        "message": "Email verification OTP generated.",
+    # Send real OTP through Gmail SMTP
+    try:
+        send_email_otp(
+            current_user.email,
+            otp,
+        )
+
+    except Exception as error:
+        # Print the REAL SMTP error only in the backend terminal.
+        # Never expose credentials/errors to the frontend.
+        print(
+            f"EMAIL SMTP ERROR: "
+            f"{type(error).__name__}: {error}"
+        )
+
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Unable to send verification email.",
+        )
+
+    return {
+        "message": "Email verification OTP sent successfully.",
     }
 
-    if settings.debug:
-        response["development_otp"] = otp
 
-    return response
-
+# ============================================================
+# VERIFY EMAIL OTP
+# ============================================================
 
 @router.post(
     "/verify-email-otp",
@@ -158,6 +192,10 @@ def verify_email_otp(
     }
 
 
+# ============================================================
+# SEND MOBILE OTP
+# ============================================================
+
 @router.post(
     "/send-mobile-otp",
 )
@@ -189,15 +227,16 @@ def send_mobile_otp(
         "mobile_verification",
     )
 
-    response = {
+    # Mobile SMS will be connected to a provider later.
+    # For now, keep the OTP stored securely in the database.
+    return {
         "message": "Mobile verification OTP generated.",
     }
 
-    if settings.debug:
-        response["development_otp"] = otp
 
-    return response
-
+# ============================================================
+# VERIFY MOBILE OTP
+# ============================================================
 
 @router.post(
     "/verify-mobile-otp",
@@ -244,6 +283,10 @@ def verify_mobile_otp(
     }
 
 
+# ============================================================
+# FORGOT PASSWORD
+# ============================================================
+
 @router.post(
     "/forgot-password",
 )
@@ -251,28 +294,36 @@ def forgot_password(
     request: ForgotPasswordRequest,
     db: Session = Depends(get_db),
 ):
-    user = get_user_by_email(db, request.email)
+    user = get_user_by_email(
+        db,
+        request.email,
+    )
 
     if user is None:
         return {
-            "message": "If the account exists, a password reset OTP has been generated."
+            "message": (
+                "If the account exists, a password reset OTP "
+                "has been generated."
+            )
         }
 
-    otp = create_otp(
+    create_otp(
         db,
         user,
         "password_reset",
     )
 
-    response = {
-        "message": "If the account exists, a password reset OTP has been generated."
+    return {
+        "message": (
+            "If the account exists, a password reset OTP "
+            "has been generated."
+        ),
     }
 
-    if settings.debug:
-        response["development_otp"] = otp
 
-    return response
-
+# ============================================================
+# RESET PASSWORD
+# ============================================================
 
 @router.post(
     "/reset-password",
@@ -281,7 +332,10 @@ def reset_password(
     request: ResetPasswordRequest,
     db: Session = Depends(get_db),
 ):
-    user = get_user_by_email(db, request.email)
+    user = get_user_by_email(
+        db,
+        request.email,
+    )
 
     if user is None:
         raise HTTPException(

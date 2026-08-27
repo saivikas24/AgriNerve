@@ -1,4 +1,4 @@
-import {
+﻿import {
   BrowserRouter,
   Navigate,
   Route,
@@ -6,36 +6,64 @@ import {
 } from "react-router-dom";
 
 import Login from "./pages/auth/Login";
+import Register from "./pages/auth/Register";
+import Verification from "./pages/auth/Verification";
+
 import FarmerDashboard from "./pages/farmer/FarmerDashboard";
+import DiseaseDetection from "./pages/farmer/DiseaseDetection";
+import MarketIntelligence from "./pages/farmer/MarketIntelligence";
+import FarmSetup from "./pages/farmer/FarmSetup";
+import CropSetup from "./pages/farmer/CropSetup";
+
 import OfficerDashboard from "./pages/officer/officerDashboard";
 
 import FarmerLayout from "./layouts/FarmerLayout";
-import DiseaseDetection from "./pages/farmer/DiseaseDetection";
-import MarketIntelligence from "./pages/farmer/MarketIntelligence";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
 
-        {/* Default */}
         <Route
           path="/"
-          element={<Navigate to="/login" replace />}
+          element={
+            <Navigate
+              to="/login"
+              replace
+            />
+          }
         />
 
-        {/* Authentication */}
         <Route
           path="/login"
           element={<Login />}
         />
 
-        {/* Farmer Application */}
+        <Route
+          path="/register"
+          element={<Register />}
+        />
+
+        <Route
+          path="/verification"
+          element={<Verification />}
+        />
+
         <Route element={<FarmerLayout />}>
 
           <Route
             path="/farmer/dashboard"
             element={<FarmerDashboard />}
+          />
+
+          <Route
+            path="/farmer/setup"
+            element={<FarmSetup />}
+          />
+
+          <Route
+            path="/farmer/crop-setup"
+            element={<CropSetup />}
           />
 
           <Route
@@ -50,7 +78,6 @@ function App() {
 
         </Route>
 
-        {/* Officer */}
         <Route
           path="/officer/dashboard"
           element={<OfficerDashboard />}
