@@ -1,4 +1,4 @@
-﻿import {
+import {
   BrowserRouter,
   Navigate,
   Route,
@@ -12,6 +12,7 @@ import Verification from "./pages/auth/Verification";
 import FarmerDashboard from "./pages/farmer/FarmerDashboard";
 import DiseaseDetection from "./pages/farmer/DiseaseDetection";
 import MarketIntelligence from "./pages/farmer/MarketIntelligence";
+import WaterIntelligence from "./pages/farmer/WaterIntelligence";
 import FarmSetup from "./pages/farmer/FarmSetup";
 import CropSetup from "./pages/farmer/CropSetup";
 
@@ -74,6 +75,11 @@ function App() {
           <Route
             path="/farmer/market-intelligence"
             element={<MarketIntelligence />}
+          />
+
+          <Route
+            path="/farmer/water-intelligence"
+            element={<WaterIntelligence />}
           />
 
         </Route>

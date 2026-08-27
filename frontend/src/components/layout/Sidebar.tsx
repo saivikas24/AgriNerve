@@ -1,4 +1,4 @@
-﻿import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import "./Sidebar.css";
 
 function Sidebar() {
@@ -65,27 +65,27 @@ function Sidebar() {
           <span>Crop Health</span>
         </NavLink>
 
-        {/* Future */}
-        <button
-          type="button"
-          className="sidebar-link future-link"
-          disabled
+        {/* Working */}
+        <NavLink
+          to="/farmer/market-intelligence"
+          className={({ isActive }) =>
+            `sidebar-link ${isActive ? "active" : ""}`
+          }
         >
           <span className="sidebar-icon">📈</span>
           <span>Market Intelligence</span>
-          <small>Coming soon</small>
-        </button>
+        </NavLink>
 
-        {/* Future */}
-        <button
-          type="button"
-          className="sidebar-link future-link"
-          disabled
+              {/* Working */}
+        <NavLink
+          to="/farmer/water-intelligence"
+          className={({ isActive }) =>
+            `sidebar-link ${isActive ? "active" : ""}`
+          }
         >
           <span className="sidebar-icon">💧</span>
           <span>Water & Irrigation</span>
-          <small>Coming soon</small>
-        </button>
+        </NavLink>
 
         {/* Future */}
         <button
