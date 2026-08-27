@@ -1,8 +1,7 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { generateDecision } from "../../services/decisionEngine";
 import {
   buildWaterIntelligence,
-  fetchDistricts,
   fetchMandals,
   fetchReservoirs,
   type Reservoir,
@@ -29,6 +28,123 @@ interface MarketForecast {
   method: string;
 }
 
+/*
+ * ==================================================
+ * NORMALIZE DISTRICT NAME
+ * ==================================================
+ *
+ * Farm profile may contain:
+ * "east godavari"
+ *
+ * Water API may expect:
+ * "East Godavari"
+ *
+ * Keep this normalization in one place.
+ */
+
+function normalizeDistrictName(
+  value: string,
+): string {
+  const normalized = value
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, " ");
+
+  const districtMap: Record<
+    string,
+    string
+  > = {
+    "east godavari": "East Godavari",
+    "eastgodavari": "East Godavari",
+
+    "west godavari": "West Godavari",
+    "westgodavari": "West Godavari",
+
+    "alluri sitharama raju":
+      "Alluri Sitharama Raju",
+
+    "ananthapuramu":
+      "Ananthapuramu",
+
+    "anantapur":
+      "Ananthapuramu",
+
+    "annamayya":
+      "Annamayya",
+
+    "bapatla":
+      "Bapatla",
+
+    "chittoor":
+      "Chittoor",
+
+    "dr. b.r. ambedkar konaseema":
+      "Dr. B.R. Ambedkar Konaseema",
+
+    "dr br ambedkar konaseema":
+      "Dr. B.R. Ambedkar Konaseema",
+
+    "eluru":
+      "Eluru",
+
+    "guntur":
+      "Guntur",
+
+    "kakinada":
+      "Kakinada",
+
+    "krishna":
+      "Krishna",
+
+    "kurnool":
+      "Kurnool",
+
+    "nandyal":
+      "Nandyal",
+
+    "ntr":
+      "NTR",
+
+    "palnadu":
+      "Palnadu",
+
+    "parvathipuram manyam":
+      "Parvathipuram Manyam",
+
+    "prakasham":
+      "Prakasam",
+
+    "nellore":
+      "SPSR Nellore",
+
+    "spsr nellore":
+      "SPSR Nellore",
+
+    "srikakulam":
+      "Srikakulam",
+
+    "tirupati":
+      "Tirupati",
+
+    "visakhapatnam":
+      "Visakhapatnam",
+
+    "vizianagaram":
+      "Vizianagaram",
+
+    "kadapa":
+      "YSR Kadapa",
+
+    "ysr kadapa":
+      "YSR Kadapa",
+  };
+
+  return (
+    districtMap[normalized] ??
+    value.trim()
+  );
+}
+
 function AgriAdvisor() {
   const {
     farm,
@@ -38,14 +154,14 @@ function AgriAdvisor() {
   } = useFarmData();
 
   const activeCrop =
-    crops.length > 0 ? crops[0] : null;
-
-  /* ================================
-     MARKET STATE
-     ================================= */
+    crops.length > 0
+      ? crops[0]
+      : null;
 
   const [marketForecast, setMarketForecast] =
-    useState<MarketForecast | null>(null);
+    useState<MarketForecast | null>(
+      null,
+    );
 
   const [marketLoading, setMarketLoading] =
     useState(false);
@@ -53,26 +169,16 @@ function AgriAdvisor() {
   const [marketDataFallback, setMarketDataFallback] =
     useState(false);
 
-  /* ================================
-     WATER STATE
-     ================================= */
-
-  const [districts, setDistricts] =
-    useState<string[]>([]);
-
   const [mandals, setMandals] =
     useState<string[]>([]);
 
   const [reservoirs, setReservoirs] =
     useState<Reservoir[]>([]);
 
-  const [district, setDistrict] =
+  const [selectedMandal, setSelectedMandal] =
     useState("");
 
-  const [mandal, setMandal] =
-    useState("");
-
-  const [reservoirId, setReservoirId] =
+  const [selectedReservoirId, setSelectedReservoirId] =
     useState("");
 
   const [waterIntelligence, setWaterIntelligence] =
@@ -80,21 +186,17 @@ function AgriAdvisor() {
       buildWaterIntelligence(null),
     );
 
-  const [loadingDistricts, setLoadingDistricts] =
-    useState(true);
-
-  const [loadingMandals, setLoadingMandals] =
-    useState(false);
-
-  const [loadingReservoirs, setLoadingReservoirs] =
+  const [waterLoading, setWaterLoading] =
     useState(false);
 
   const [waterError, setWaterError] =
     useState("");
 
-  /* ================================
-     LOAD MARKET FORECAST
-     ================================= */
+  /*
+   * ==================================================
+   * MARKET INTELLIGENCE
+   * ==================================================
+   */
 
   useEffect(() => {
     const loadMarketForecast = async () => {
@@ -114,11 +216,12 @@ function AgriAdvisor() {
         const market =
           farm.preferred_market;
 
-        const varietiesResponse = await fetch(
-          `http://127.0.0.1:8000/api/v1/market/varieties?market=${encodeURIComponent(
-            market,
-          )}`,
-        );
+        const varietiesResponse =
+          await fetch(
+            `http://127.0.0.1:8000/api/v1/market/varieties?market=${encodeURIComponent(
+              market,
+            )}`,
+          );
 
         if (!varietiesResponse.ok) {
           setMarketForecast(null);
@@ -133,11 +236,6 @@ function AgriAdvisor() {
 
         let usingFallback = false;
 
-        /*
-         * Current dataset fallback:
-         * Paddy/BPT → available 1001 dataset.
-         */
-
         if (
           !availableVarieties.includes(
             activeCrop.variety,
@@ -145,7 +243,9 @@ function AgriAdvisor() {
           activeCrop.crop_name
             ?.toLowerCase()
             .includes("paddy") &&
-          availableVarieties.includes("1001")
+          availableVarieties.includes(
+            "1001",
+          )
         ) {
           marketVariety = "1001";
           usingFallback = true;
@@ -173,9 +273,10 @@ function AgriAdvisor() {
           marketVariety,
         );
 
-        const response = await fetch(
-          `http://127.0.0.1:8000/api/v1/market/forecast?${params.toString()}`,
-        );
+        const response =
+          await fetch(
+            `http://127.0.0.1:8000/api/v1/market/forecast?${params.toString()}`,
+          );
 
         if (!response.ok) {
           setMarketForecast(null);
@@ -209,178 +310,170 @@ function AgriAdvisor() {
     farm?.preferred_market,
   ]);
 
-  /* ================================
-     LOAD WATER DISTRICTS
-     ================================= */
+  /*
+   * ==================================================
+   * LOAD MANDALS FOR FARM DISTRICT
+   * ==================================================
+   */
 
   useEffect(() => {
-    async function loadDistricts() {
-      try {
-        setWaterError("");
+    const loadMandals = async () => {
+      if (!farm?.district) {
+        setMandals([]);
+        setSelectedMandal("");
+        setReservoirs([]);
+        setSelectedReservoirId("");
 
-        const data =
-          await fetchDistricts();
-
-        setDistricts(data);
-      } catch (error) {
-        console.error(
-          "Advisor water districts error:",
-          error,
+        setWaterIntelligence(
+          buildWaterIntelligence(null),
         );
 
-        setWaterError(
-          error instanceof Error
-            ? error.message
-            : "Unable to load districts.",
-        );
-      } finally {
-        setLoadingDistricts(false);
+        return;
       }
-    }
 
-    loadDistricts();
-  }, []);
-
-  /* ================================
-     LOAD WATER MANDALS
-     ================================= */
-
-  useEffect(() => {
-    if (!district) {
-      setMandals([]);
-      setMandal("");
-      setReservoirs([]);
-      setReservoirId("");
-      setWaterIntelligence(
-        buildWaterIntelligence(null),
-      );
-      return;
-    }
-
-    async function loadMandals() {
       try {
-        setLoadingMandals(true);
         setWaterError("");
+
+        const normalizedDistrict =
+          normalizeDistrictName(
+            farm.district,
+          );
 
         const data =
           await fetchMandals(
-            district,
+            normalizedDistrict,
           );
 
         setMandals(data);
 
-        setMandal("");
+        /*
+         * Do not automatically select
+         * a mandal.
+         *
+         * Farmer should choose it.
+         */
 
+        setSelectedMandal("");
         setReservoirs([]);
-
-        setReservoirId("");
+        setSelectedReservoirId("");
 
         setWaterIntelligence(
           buildWaterIntelligence(null),
         );
       } catch (error) {
         console.error(
-          "Advisor water mandals error:",
+          "Advisor mandal loading error:",
           error,
         );
 
         setMandals([]);
+        setSelectedMandal("");
 
         setWaterError(
-          error instanceof Error
-            ? error.message
-            : "Unable to load mandals.",
+          "Unable to load water locations.",
         );
-      } finally {
-        setLoadingMandals(false);
       }
-    }
+    };
 
     loadMandals();
-  }, [district]);
+  }, [farm?.district]);
 
-  /* ================================
-     LOAD WATER RESERVOIRS
-     ================================= */
+  /*
+   * ==================================================
+   * LOAD RESERVOIRS
+   * ==================================================
+   */
 
   useEffect(() => {
-    if (!district || !mandal) {
-      setReservoirs([]);
-      setReservoirId("");
+    const loadReservoirs = async () => {
+      if (
+        !farm?.district ||
+        !selectedMandal
+      ) {
+        setReservoirs([]);
+        setSelectedReservoirId("");
 
-      setWaterIntelligence(
-        buildWaterIntelligence(null),
-      );
+        setWaterIntelligence(
+          buildWaterIntelligence(null),
+        );
 
-      return;
-    }
+        return;
+      }
 
-    async function loadReservoirs() {
       try {
-        setLoadingReservoirs(true);
+        setWaterLoading(true);
         setWaterError("");
+
+        const normalizedDistrict =
+          normalizeDistrictName(
+            farm.district,
+          );
 
         const data =
           await fetchReservoirs(
-            district,
-            mandal,
+            normalizedDistrict,
+            selectedMandal,
           );
 
         setReservoirs(data);
 
         /*
-         * Do NOT automatically select one.
-         * Let the farmer choose.
+         * Do not automatically select
+         * a reservoir.
          */
 
-        setReservoirId("");
+        setSelectedReservoirId("");
 
         setWaterIntelligence(
           buildWaterIntelligence(null),
         );
       } catch (error) {
         console.error(
-          "Advisor water reservoirs error:",
+          "Advisor reservoir loading error:",
           error,
         );
 
         setReservoirs([]);
-
-        setReservoirId("");
+        setSelectedReservoirId("");
 
         setWaterIntelligence(
           buildWaterIntelligence(null),
         );
 
         setWaterError(
-          error instanceof Error
-            ? error.message
-            : "Unable to load reservoirs.",
+          "Unable to load reservoir data.",
         );
       } finally {
-        setLoadingReservoirs(false);
+        setWaterLoading(false);
       }
-    }
+    };
 
     loadReservoirs();
   }, [
-    district,
-    mandal,
+    farm?.district,
+    selectedMandal,
   ]);
 
-  /* ================================
-     RESERVOIR SELECTION
-     ================================= */
+  /*
+   * ==================================================
+   * UPDATE WATER INTELLIGENCE
+   * ==================================================
+   */
 
-  function handleReservoirChange(
-    value: string,
-  ) {
-    setReservoirId(value);
+  useEffect(() => {
+    if (!selectedReservoirId) {
+      setWaterIntelligence(
+        buildWaterIntelligence(null),
+      );
+
+      return;
+    }
 
     const reservoir =
       reservoirs.find(
         (item) =>
-          String(item.id) === value,
+          String(item.id) ===
+          selectedReservoirId,
       );
 
     setWaterIntelligence(
@@ -388,11 +481,16 @@ function AgriAdvisor() {
         reservoir ?? null,
       ),
     );
-  }
+  }, [
+    selectedReservoirId,
+    reservoirs,
+  ]);
 
-  /* ================================
-     LOADING
-     ================================= */
+  /*
+   * ==================================================
+   * LOADING
+   * ==================================================
+   */
 
   if (farmLoading) {
     return (
@@ -414,10 +512,6 @@ function AgriAdvisor() {
       </main>
     );
   }
-
-  /* ================================
-     FARM ERROR
-     ================================= */
 
   if (farmError) {
     return (
@@ -441,9 +535,11 @@ function AgriAdvisor() {
     return null;
   }
 
-  /* ================================
-     DECISION ENGINE
-     ================================= */
+  /*
+   * ==================================================
+   * DECISION ENGINE
+   * ==================================================
+   */
 
   const decision =
     generateDecision({
@@ -482,9 +578,7 @@ function AgriAdvisor() {
   return (
     <main style={pageStyle}>
 
-      {/* =================================
-          HEADER
-          ================================= */}
+      {/* HEADER */}
 
       <section style={heroStyle}>
         <span style={eyebrowStyle}>
@@ -497,15 +591,14 @@ function AgriAdvisor() {
 
         <p>
           AgriNerve combines your farm,
-          crop, water and market information
-          to generate contextual agricultural
+          crop, water and market
+          information to generate
+          contextual agricultural
           intelligence.
         </p>
       </section>
 
-      {/* =================================
-          FARM CONTEXT
-          ================================= */}
+      {/* FARM CONTEXT */}
 
       <section style={gridStyle}>
 
@@ -581,9 +674,7 @@ function AgriAdvisor() {
 
       </section>
 
-      {/* =================================
-          WATER INTELLIGENCE
-          ================================= */}
+      {/* WATER */}
 
       <section style={sectionStyle}>
 
@@ -596,148 +687,104 @@ function AgriAdvisor() {
         </h2>
 
         <p>
-          Select a district, mandal and
-          reservoir to include current
-          water conditions in your
-          agricultural decision.
+          Your farm district is used
+          automatically. Select a mandal
+          and reservoir to include current
+          water conditions.
         </p>
 
         {waterError && (
           <div style={errorStyle}>
-            <strong>
-              Unable to load water data
-            </strong>
-
-            <p>
-              {waterError}
-            </p>
+            {waterError}
           </div>
         )}
 
         <div style={waterGridStyle}>
 
-          {/* DISTRICT */}
-
           <div>
-            <label
-              htmlFor="advisor-district"
-              style={labelStyle}
-            >
+            <label style={labelStyle}>
               District
             </label>
 
-            <select
-              id="advisor-district"
-              value={district}
-              onChange={(event) =>
-                setDistrict(
-                  event.target.value,
-                )
-              }
-              disabled={
-                loadingDistricts
-              }
-              style={selectStyle}
+            <div
+              style={readonlyFieldStyle}
             >
-              <option value="">
-                {loadingDistricts
-                  ? "Loading districts..."
-                  : "Select district"}
-              </option>
-
-              {districts.map(
-                (item) => (
-                  <option
-                    key={item}
-                    value={item}
-                  >
-                    {item}
-                  </option>
-                ),
-              )}
-            </select>
+              {farm.district ||
+                "Not available"}
+            </div>
           </div>
 
-          {/* MANDAL */}
-
           <div>
-            <label
-              htmlFor="advisor-mandal"
-              style={labelStyle}
-            >
+            <label style={labelStyle}>
               Mandal
             </label>
 
             <select
-              id="advisor-mandal"
-              value={mandal}
+              value={selectedMandal}
               onChange={(event) =>
-                setMandal(
+                setSelectedMandal(
                   event.target.value,
                 )
               }
-              disabled={
-                !district ||
-                loadingMandals
-              }
               style={selectStyle}
+              disabled={
+                mandals.length === 0
+              }
             >
               <option value="">
-                {loadingMandals
-                  ? "Loading mandals..."
+                {mandals.length === 0
+                  ? "No mandals available"
                   : "Select mandal"}
               </option>
 
               {mandals.map(
-                (item) => (
+                (mandal) => (
                   <option
-                    key={item}
-                    value={item}
+                    key={mandal}
+                    value={mandal}
                   >
-                    {item}
+                    {mandal}
                   </option>
                 ),
               )}
             </select>
           </div>
 
-          {/* RESERVOIR */}
-
           <div>
-            <label
-              htmlFor="advisor-reservoir"
-              style={labelStyle}
-            >
+            <label style={labelStyle}>
               Reservoir
             </label>
 
             <select
-              id="advisor-reservoir"
-              value={reservoirId}
+              value={
+                selectedReservoirId
+              }
               onChange={(event) =>
-                handleReservoirChange(
+                setSelectedReservoirId(
                   event.target.value,
                 )
               }
-              disabled={
-                !mandal ||
-                loadingReservoirs
-              }
               style={selectStyle}
+              disabled={
+                reservoirs.length === 0 ||
+                waterLoading
+              }
             >
               <option value="">
-                {loadingReservoirs
+                {waterLoading
                   ? "Loading reservoirs..."
                   : "Select reservoir"}
               </option>
 
               {reservoirs.map(
-                (item) => (
+                (reservoir) => (
                   <option
-                    key={item.id}
-                    value={item.id}
+                    key={reservoir.id}
+                    value={String(
+                      reservoir.id,
+                    )}
                   >
-                    {item.reservoir}
+                    {reservoir.reservoir}
                   </option>
                 ),
               )}
@@ -746,8 +793,6 @@ function AgriAdvisor() {
 
         </div>
 
-        {/* WATER RESULT */}
-
         <div style={waterResultStyle}>
 
           <div>
@@ -755,9 +800,7 @@ function AgriAdvisor() {
               WATER AVAILABILITY
             </span>
 
-            <strong
-              style={bigMetricStyle}
-            >
+            <strong style={bigMetricStyle}>
               {
                 waterIntelligence.availability
               }
@@ -770,9 +813,7 @@ function AgriAdvisor() {
             </span>
 
             <strong>
-              {
-                waterIntelligence.status
-              }
+              {waterIntelligence.status}
             </strong>
           </div>
 
@@ -794,9 +835,7 @@ function AgriAdvisor() {
             </span>
 
             <strong>
-              {
-                waterIntelligence.source
-              }
+              {waterIntelligence.source}
             </strong>
           </div>
 
@@ -804,9 +843,7 @@ function AgriAdvisor() {
 
       </section>
 
-      {/* =================================
-          DECISION
-          ================================= */}
+      {/* DECISION */}
 
       <section style={decisionCardStyle}>
 
@@ -874,9 +911,7 @@ function AgriAdvisor() {
 
       </section>
 
-      {/* =================================
-          MARKET INTELLIGENCE
-          ================================= */}
+      {/* MARKET */}
 
       <section style={sectionStyle}>
 
@@ -889,9 +924,7 @@ function AgriAdvisor() {
         </h2>
 
         {!marketForecast ? (
-
           <div style={emptyStyle}>
-
             <strong>
               Market intelligence unavailable
             </strong>
@@ -902,15 +935,11 @@ function AgriAdvisor() {
               compatible crop market
               data is available.
             </p>
-
           </div>
-
         ) : (
-
           <>
             {marketDataFallback && (
               <div style={noticeStyle}>
-
                 <strong>
                   Market dataset notice
                 </strong>
@@ -924,12 +953,9 @@ function AgriAdvisor() {
                   market intelligence uses
                   the available Paddy
                   dataset (
-                  {
-                    marketForecast.variety
-                  }
+                  {marketForecast.variety}
                   ) as a temporary reference.
                 </p>
-
               </div>
             )}
 
@@ -952,12 +978,10 @@ function AgriAdvisor() {
                 </span>
 
                 <strong>
-                  {
-                    marketForecast.recent_change_percent >=
-                    0
-                      ? "+"
-                      : ""
-                  }
+                  {marketForecast.recent_change_percent >=
+                  0
+                    ? "+"
+                    : ""}
                   {marketForecast.recent_change_percent.toFixed(
                     1,
                   )}
@@ -992,9 +1016,7 @@ function AgriAdvisor() {
 
       </section>
 
-      {/* =================================
-          DECISION TRANSPARENCY
-          ================================= */}
+      {/* TRANSPARENCY */}
 
       <section style={sectionStyle}>
 
@@ -1036,7 +1058,7 @@ function AgriAdvisor() {
                 {waterIntelligence.status ===
                 "Unavailable"
                   ? "No reservoir has been selected yet."
-                  : `The selected reservoir has ${waterIntelligence.availability} water availability and is classified as ${waterIntelligence.status}.`}
+                  : `Water status is ${waterIntelligence.status} with ${waterIntelligence.availability} availability.`}
               </p>
             </div>
           </div>
@@ -1066,9 +1088,10 @@ function AgriAdvisor() {
               </strong>
 
               <p>
-                Weather intelligence
-                will be added as an
-                independent module.
+                Weather intelligence will
+                be added as the next
+                independent intelligence
+                module.
               </p>
             </div>
           </div>
@@ -1082,11 +1105,11 @@ function AgriAdvisor() {
               </strong>
 
               <p>
-                Disease detection
-                remains an independent
-                intelligence module and
-                can be connected to the
-                decision engine separately.
+                Disease detection remains
+                an independent intelligence
+                module and will be connected
+                to the decision engine
+                separately.
               </p>
             </div>
           </div>
@@ -1099,9 +1122,9 @@ function AgriAdvisor() {
   );
 }
 
-/* =====================================
+/* ==================================================
    STYLES
-   ===================================== */
+   ================================================== */
 
 const pageStyle: React.CSSProperties = {
   padding: "32px",
@@ -1250,6 +1273,14 @@ const selectStyle: React.CSSProperties = {
   borderRadius: "10px",
   border: "1px solid #ccd7cc",
   background: "#ffffff",
+  fontSize: "14px",
+};
+
+const readonlyFieldStyle: React.CSSProperties = {
+  padding: "12px",
+  borderRadius: "10px",
+  border: "1px solid #ccd7cc",
+  background: "#f6f8f5",
   fontSize: "14px",
 };
 

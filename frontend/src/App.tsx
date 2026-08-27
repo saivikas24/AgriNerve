@@ -15,6 +15,7 @@ import MarketIntelligence from "./pages/farmer/MarketIntelligence";
 import WaterIntelligence from "./pages/farmer/WaterIntelligence";
 import FarmSetup from "./pages/farmer/FarmSetup";
 import CropSetup from "./pages/farmer/CropSetup";
+import AgriAdvisor from "./pages/farmer/AgriAdvisor";
 
 import OfficerDashboard from "./pages/officer/officerDashboard";
 
@@ -80,6 +81,11 @@ function App() {
           <Route
             path="/farmer/water-intelligence"
             element={<WaterIntelligence />}
+          />
+
+          <Route
+            path="/farmer/advisor"
+            element={<AgriAdvisor />}
           />
 
         </Route>
