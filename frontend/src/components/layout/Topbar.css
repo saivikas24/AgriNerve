@@ -35,7 +35,7 @@
 .topbar-heading h2 {
   margin: 0;
 
-  color: var(--text-primary);
+ color: var(--agri-green-600);
 
   font-size: 20px;
   font-weight: 700;
@@ -139,4 +139,8 @@
   .profile-details {
     display: none;
   }
+}
+/* AgriNerve green accent for topbar greeting */
+.topbar-heading h2 {
+  color: var(--agri-green-600);
 }

@@ -535,7 +535,7 @@ function FarmerDashboard() {
           </span>
 
           <h1>
-            Good morning, Farmer ??
+          Good morning, {farm.farm_name}
           </h1>
 
           <p>
@@ -800,7 +800,7 @@ function FarmerDashboard() {
             marketLoading
               ? "Loading..."
               : marketForecast
-                ? `&#8377;${marketForecast.current_price.toLocaleString()}`
+                ? `₹${marketForecast.current_price.toLocaleString()}`
                 : "-"
           }
           priceChange={
@@ -857,7 +857,7 @@ function FarmerDashboard() {
               : waterError
                 ? "Unavailable"
                 : selectedReservoir
-                  ? "AP DES"
+                  ? "AP DES • Andhra Pradesh Govt."
                   : "Waiting for selection"
           }
         />

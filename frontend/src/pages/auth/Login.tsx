@@ -103,7 +103,7 @@ function Login() {
       <section className="login-container">
 
         <div className="login-brand">
-          <div className="brand-icon">??</div>
+        <div className="brand-icon">🌱</div>
 
           <h1>AgriNerve</h1>
 

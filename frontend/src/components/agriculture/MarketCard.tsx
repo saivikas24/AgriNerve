@@ -68,6 +68,50 @@ function MarketCard({
 
         <strong>{marketName}</strong>
       </div>
+
+      <div
+        style={{
+          marginTop: "14px",
+          paddingTop: "12px",
+          borderTop: "1px solid #e5e7eb",
+        }}
+      >
+        <span
+          style={{
+            display: "block",
+            fontSize: "11px",
+            fontWeight: 700,
+            letterSpacing: "0.6px",
+            textTransform: "uppercase",
+            color: "#667085",
+            marginBottom: "4px",
+          }}
+        >
+          Data Source
+        </span>
+
+        <strong
+          style={{
+            display: "block",
+            fontSize: "13px",
+            fontWeight: 600,
+            color: "#344054",
+          }}
+        >
+          AGMARKNET
+        </strong>
+
+        <span
+          style={{
+            display: "block",
+            marginTop: "2px",
+            fontSize: "11px",
+            color: "#667085",
+          }}
+        >
+          Government of India
+        </span>
+      </div>
     </section>
   );
 }

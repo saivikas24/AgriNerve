@@ -1,6 +1,7 @@
 .farmer-dashboard {
   max-width: 1400px;
   margin: 0 auto;
+  padding-bottom: 32px;
 }
 
 .dashboard-heading {
@@ -26,9 +27,7 @@
 
 .dashboard-heading h1 {
   margin: 0;
-
-  color: var(--text-primary);
-
+  color: var(--agri-green-600);
   font-size: 28px;
   font-weight: 750;
   letter-spacing: -0.6px;
@@ -76,6 +75,15 @@
 
 .dashboard-metrics > section {
   min-width: 0;
+  height: 100%;
+}
+/* Consistent AgriNerve green accents */
+.metric-card-eyebrow {
+  color: var(--agri-green-600);
+}
+
+.metric-card-title {
+  color: var(--text-primary);
 }
 
 /* Mobile */
