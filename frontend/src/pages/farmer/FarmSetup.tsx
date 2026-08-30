@@ -237,7 +237,7 @@ function FarmSetup() {
       <section className="farm-setup-container">
 
         <div className="farm-setup-brand">
-          <div className="farm-setup-logo">??</div>
+          <div className="farm-setup-logo">🌱</div>
 
           <h1>AgriNerve</h1>
 
@@ -251,7 +251,7 @@ function FarmSetup() {
           <div className="farm-setup-header">
 
             <span className="farm-setup-icon">
-              ??
+              🚜
             </span>
 
             <div>
@@ -544,7 +544,7 @@ function FarmSetup() {
 
             <div className="farm-setup-note">
 
-              <span>??</span>
+              <span>🔄</span>
 
               <p>
                 You can update these details later.
@@ -565,7 +565,7 @@ function FarmSetup() {
                   : "Saving farm..."
                 : isEditing
                   ? "Update Farm"
-                  : "Save Farm & Continue ?"}
+                  : "Save Farm & Continue ➡️"}
             </button>
 
           </form>

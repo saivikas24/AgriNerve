@@ -131,59 +131,64 @@ function FarmerDashboard() {
    * Load market intelligence for the active crop.
    */
   useEffect(() => {
-    const loadMarketForecast = async () => {
-      if (!activeCrop?.variety) {
+  async function loadMarketForecast() {
+    if (!farm?.preferred_market || !activeCrop) {
+      setMarketForecast(null);
+      return;
+    }
+
+    const market = farm.preferred_market.trim();
+    const variety = activeCrop.variety?.trim();
+
+    if (!variety) {
+      setMarketForecast(null);
+      return;
+    }
+
+    try {
+      setMarketLoading(true);
+
+      const params = new URLSearchParams({
+        market,
+        variety,
+      });
+
+      const response = await fetch(
+        `http://127.0.0.1:8000/api/v1/market/forecast?${params.toString()}`,
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          "Market forecast unavailable.",
+        );
+      }
+
+      const data = await response.json();
+
+      if (data.error) {
         setMarketForecast(null);
         return;
       }
 
-      if (!farm?.preferred_market) {
-        setMarketForecast(null);
-        return;
-      }
+      setMarketForecast(data);
+    } catch (error) {
+      console.error(
+        "Dashboard market loading error:",
+        error,
+      );
 
-      const cropVariety = activeCrop.variety;
-      const preferredMarket =
-        farm.preferred_market;
+      setMarketForecast(null);
+    } finally {
+      setMarketLoading(false);
+    }
+  }
 
-      try {
-        setMarketLoading(true);
-
-        const params = new URLSearchParams();
-
-        params.set("market", preferredMarket);
-        params.set("variety", cropVariety);
-
-        const forecastResponse = await fetch(
-          `http://127.0.0.1:8000/api/v1/market/forecast?${params.toString()}`,
-        );
-
-        if (!forecastResponse.ok) {
-          setMarketForecast(null);
-          return;
-        }
-
-        const forecast: MarketForecast =
-          await forecastResponse.json();
-
-        setMarketForecast(forecast);
-      } catch (error) {
-        console.error(
-          "Dashboard market loading error:",
-          error,
-        );
-
-        setMarketForecast(null);
-      } finally {
-        setMarketLoading(false);
-      }
-    };
-
-    loadMarketForecast();
-  }, [
-    activeCrop?.variety,
-    farm?.preferred_market,
-  ]);
+  loadMarketForecast();
+}, [
+  farm?.preferred_market,
+  activeCrop?.id,
+  activeCrop?.variety,
+]);
 
   /*
    * WATER DATA

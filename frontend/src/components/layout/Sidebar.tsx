@@ -56,8 +56,6 @@ function Sidebar() {
           <span>Dashboard</span>
         </NavLink>
 
-      
-
         {/* Crop Health */}
         <NavLink
           to="/farmer/disease-detection"
@@ -80,7 +78,7 @@ function Sidebar() {
           <span>Market Intelligence</span>
         </NavLink>
 
-        {/* Water & Irrigation */}
+        {/* Water & AI Advisor */}
         <NavLink
           to="/farmer/water-intelligence"
           className={({ isActive }) =>
@@ -88,20 +86,10 @@ function Sidebar() {
           }
         >
           <span className="sidebar-icon">💧</span>
-          <span>Water & Irrigation</span>
+          <span>Water & AI Advisor</span>
         </NavLink>
 
       </nav>
-        {/* Agri AI Advisor - Main Decision Page */}
-        <NavLink
-          to="/farmer/advisor"
-          className={({ isActive }) =>
-            `sidebar-link ${isActive ? "active" : ""}`
-          }
-        >
-          <span className="sidebar-icon">🤖</span>
-          <span>Agri AI Advisor</span>
-        </NavLink>
 
       {/* Regional identity */}
       <div className="regional-card">

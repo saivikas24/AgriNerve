@@ -11,55 +11,90 @@ import "./CropSetup.css";
 function CropSetup() {
   const navigate = useNavigate();
 
-  const [farmId, setFarmId] = useState<number | null>(null);
+  const [farmId, setFarmId] =
+    useState<number | null>(null);
 
-  const [cropName, setCropName] = useState("");
-  const [variety, setVariety] = useState("");
-  const [areaAcres, setAreaAcres] = useState("");
-  const [sowingDate, setSowingDate] = useState("");
-  const [harvestDate, setHarvestDate] = useState("");
-  const [season, setSeason] = useState("Kharif");
+  const [preferredMarket, setPreferredMarket] =
+    useState("");
 
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
+  const [cropName, setCropName] =
+    useState("");
+
+  const [variety, setVariety] =
+    useState("");
+
+  const [varieties, setVarieties] =
+    useState<string[]>([]);
+
+  const [varietiesLoading, setVarietiesLoading] =
+    useState(false);
+
+  const [areaAcres, setAreaAcres] =
+    useState("");
+
+  const [sowingDate, setSowingDate] =
+    useState("");
+
+  const [harvestDate, setHarvestDate] =
+    useState("");
+
+  const [season, setSeason] =
+    useState("Kharif");
+
+  const [loading, setLoading] =
+    useState(true);
+
+  const [saving, setSaving] =
+    useState(false);
+
+  const [error, setError] =
+    useState("");
 
 
+  /*
+   * LOAD ACTIVE FARM
+   */
   useEffect(() => {
     async function loadFarm() {
       try {
-        const activeFarmId = localStorage.getItem(
-        "agrinerve_active_farm_id",
-      );
+        const activeFarmId =
+          localStorage.getItem(
+            "agrinerve_active_farm_id",
+          );
 
-      if (!activeFarmId) {
-        navigate("/farmer/setup", {
-          replace: true,
-        });
-        return;
-      }
+        if (!activeFarmId) {
+          navigate("/farmer/setup", {
+            replace: true,
+          });
+          return;
+        }
 
-      const farms = await getFarms();
+        const farms = await getFarms();
 
-      const activeFarm = farms.find(
-        (farm) => farm.id === Number(activeFarmId),
-      );
-
-      if (!activeFarm) {
-        localStorage.removeItem(
-          "agrinerve_active_farm_id",
+        const activeFarm = farms.find(
+          (farm) =>
+            farm.id === Number(activeFarmId),
         );
 
-        navigate("/farmer/setup", {
-          replace: true,
-        });
-        return;
-      }
+        if (!activeFarm) {
+          localStorage.removeItem(
+            "agrinerve_active_farm_id",
+          );
 
-      setFarmId(Number(activeFarmId));
+          navigate("/farmer/setup", {
+            replace: true,
+          });
+          return;
+        }
+
+        setFarmId(Number(activeFarmId));
 
         setAreaAcres(
           String(activeFarm.area_acres),
+        );
+
+        setPreferredMarket(
+          activeFarm.preferred_market ?? "",
         );
 
       } catch (err) {
@@ -77,6 +112,84 @@ function CropSetup() {
   }, [navigate]);
 
 
+  /*
+   * LOAD VARIETIES
+   *
+   * Crop selection is independent from
+   * market availability.
+   *
+   * Currently our market dataset/API
+   * supports Paddy(Common).
+   */
+  useEffect(() => {
+    async function loadVarieties() {
+      setVariety("");
+      setVarieties([]);
+
+      if (!cropName) {
+        return;
+      }
+
+      /*
+       * Current market dataset is Paddy based.
+       *
+       * Other crops can still be selected
+       * and saved. They simply don't have
+       * market variety data yet.
+       */
+      if (
+        cropName.toLowerCase() !==
+        "paddy"
+      ) {
+        return;
+      }
+
+      if (!preferredMarket) {
+        return;
+      }
+
+      try {
+        setVarietiesLoading(true);
+
+        const response = await fetch(
+          `http://127.0.0.1:8000/api/v1/market/varieties?market=${encodeURIComponent(
+            preferredMarket,
+          )}`,
+        );
+
+        if (!response.ok) {
+          setVarieties([]);
+          return;
+        }
+
+        const data: string[] =
+          await response.json();
+
+        setVarieties(data);
+
+      } catch (error) {
+        console.error(
+          "Unable to load market varieties:",
+          error,
+        );
+
+        setVarieties([]);
+
+      } finally {
+        setVarietiesLoading(false);
+      }
+    }
+
+    loadVarieties();
+  }, [
+    cropName,
+    preferredMarket,
+  ]);
+
+
+  /*
+   * SAVE CROP
+   */
   async function handleSubmit(
     event: FormEvent<HTMLFormElement>,
   ) {
@@ -88,19 +201,21 @@ function CropSetup() {
     }
 
     if (!cropName.trim()) {
-      setError("Please enter the crop name.");
+      setError(
+        "Please enter the crop name.",
+      );
       return;
     }
 
     const area = Number(areaAcres);
 
-    if (!Number.isFinite(area) || area <= 0) {
-      setError("Please enter a valid crop area.");
-      return;
-    }
-
-    if (area > Number(areaAcres)) {
-      setError("Invalid crop area.");
+    if (
+      !Number.isFinite(area) ||
+      area <= 0
+    ) {
+      setError(
+        "Please enter a valid crop area.",
+      );
       return;
     }
 
@@ -110,12 +225,21 @@ function CropSetup() {
     try {
       await createCrop(farmId, {
         crop_name: cropName.trim(),
-        variety: variety.trim() || undefined,
+
+        variety:
+          variety.trim() || undefined,
+
         area_acres: area,
-        sowing_date: sowingDate || undefined,
+
+        sowing_date:
+          sowingDate || undefined,
+
         expected_harvest_date:
           harvestDate || undefined,
-        season: season || undefined,
+
+        season:
+          season || undefined,
+
         status: "growing",
       });
 
@@ -138,9 +262,15 @@ function CropSetup() {
   if (loading) {
     return (
       <main className="crop-setup-page">
+
         <section className="crop-setup-card">
-          <p>Loading your farm...</p>
+
+          <p>
+            Loading your farm...
+          </p>
+
         </section>
+
       </main>
     );
   }
@@ -181,6 +311,8 @@ function CropSetup() {
 
           <div className="crop-form-grid">
 
+            {/* CROP */}
+
             <div className="crop-form-group">
 
               <label htmlFor="crop-name">
@@ -191,7 +323,9 @@ function CropSetup() {
                 id="crop-name"
                 value={cropName}
                 onChange={(event) =>
-                  setCropName(event.target.value)
+                  setCropName(
+                    event.target.value,
+                  )
                 }
                 required
               >
@@ -245,24 +379,101 @@ function CropSetup() {
             </div>
 
 
+            {/* VARIETY */}
+
             <div className="crop-form-group">
 
               <label htmlFor="variety">
                 Variety
               </label>
 
-              <input
+              <select
                 id="variety"
-                type="text"
-                placeholder="e.g. BPT 5204"
                 value={variety}
                 onChange={(event) =>
-                  setVariety(event.target.value)
+                  setVariety(
+                    event.target.value,
+                  )
                 }
-              />
+                disabled={
+                  !cropName ||
+                  varietiesLoading
+                }
+              >
+
+                <option value="">
+                  {!cropName
+                    ? "Select crop first"
+                    : varietiesLoading
+                      ? "Loading varieties..."
+                      : varieties.length > 0
+                        ? "Select variety"
+                        : "No market varieties available"}
+                </option>
+
+                {varieties.map(
+                  (item) => (
+                    <option
+                      key={item}
+                      value={item}
+                    >
+                      {item}
+                    </option>
+                  ),
+                )}
+
+              </select>
+
+              {/* Market availability message */}
+
+              {cropName &&
+                cropName.toLowerCase() !==
+                  "paddy" && (
+                  <small
+                    style={{
+                      display: "block",
+                      marginTop: "6px",
+                      color:
+                        "var(--text-secondary)",
+                      fontSize: "11px",
+                    }}
+                  >
+                    Market intelligence for{" "}
+                    {cropName} is not
+                    currently available in
+                    the selected market.
+                    You can still continue
+                    with this crop.
+                  </small>
+                )}
+
+              {cropName &&
+                cropName.toLowerCase() ===
+                  "paddy" &&
+                preferredMarket &&
+                varieties.length === 0 &&
+                !varietiesLoading && (
+                  <small
+                    style={{
+                      display: "block",
+                      marginTop: "6px",
+                      color:
+                        "var(--text-secondary)",
+                      fontSize: "11px",
+                    }}
+                  >
+                    No Paddy varieties are
+                    currently available for
+                    {` ${preferredMarket}`}.
+                    You can still continue
+                    with this crop.
+                  </small>
+                )}
 
             </div>
 
+
+            {/* AREA */}
 
             <div className="crop-form-group">
 
@@ -277,13 +488,17 @@ function CropSetup() {
                 step="0.01"
                 value={areaAcres}
                 onChange={(event) =>
-                  setAreaAcres(event.target.value)
+                  setAreaAcres(
+                    event.target.value,
+                  )
                 }
                 required
               />
 
             </div>
 
+
+            {/* SEASON */}
 
             <div className="crop-form-group">
 
@@ -295,7 +510,9 @@ function CropSetup() {
                 id="season"
                 value={season}
                 onChange={(event) =>
-                  setSeason(event.target.value)
+                  setSeason(
+                    event.target.value,
+                  )
                 }
               >
 
@@ -320,6 +537,8 @@ function CropSetup() {
             </div>
 
 
+            {/* SOWING DATE */}
+
             <div className="crop-form-group">
 
               <label htmlFor="sowing-date">
@@ -331,12 +550,16 @@ function CropSetup() {
                 type="date"
                 value={sowingDate}
                 onChange={(event) =>
-                  setSowingDate(event.target.value)
+                  setSowingDate(
+                    event.target.value,
+                  )
                 }
               />
 
             </div>
 
+
+            {/* HARVEST DATE */}
 
             <div className="crop-form-group">
 
@@ -349,7 +572,9 @@ function CropSetup() {
                 type="date"
                 value={harvestDate}
                 onChange={(event) =>
-                  setHarvestDate(event.target.value)
+                  setHarvestDate(
+                    event.target.value,
+                  )
                 }
               />
 
@@ -365,9 +590,10 @@ function CropSetup() {
             </strong>
 
             <p>
-              Your crop and sowing information helps
-              AgriNerve provide more relevant disease,
-              market, water and farming recommendations.
+              Your crop and sowing information
+              helps AgriNerve provide more
+              relevant disease, market, water
+              and farming recommendations.
             </p>
 
           </div>
@@ -379,7 +605,9 @@ function CropSetup() {
               type="button"
               className="crop-cancel-button"
               onClick={() =>
-                navigate("/farmer/dashboard")
+                navigate(
+                  "/farmer/dashboard",
+                )
               }
               disabled={saving}
             >
@@ -409,7 +637,3 @@ function CropSetup() {
 
 
 export default CropSetup;
-
-
-
-
