@@ -6,7 +6,6 @@ import MarketCard from "../../components/agriculture/MarketCard";
 import WaterStatusCard from "../../components/agriculture/WaterStatusCard";
 import WeatherStatusCard from "../../components/agriculture/WeatherStatusCard";
 import RecommendationCard from "../../components/agriculture/RecommendationCard";
-
 import "./FarmerDashboard.css";
 import { useFarmData } from "./dashboard/hooks/useFarmData";
 
@@ -488,7 +487,6 @@ function FarmerDashboard() {
             <span className="dashboard-eyebrow">
               FARM OVERVIEW
             </span>
-
             <h1>
               Loading your farm...
             </h1>

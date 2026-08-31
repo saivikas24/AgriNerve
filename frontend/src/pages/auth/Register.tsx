@@ -76,7 +76,7 @@ function Register() {
       <section className="register-container">
 
         <div className="register-brand">
-          <div className="register-logo">??</div>
+          <div className="register-logo"></div>
 
           <h1>AgriNerve</h1>
 
